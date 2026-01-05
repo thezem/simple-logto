@@ -193,7 +193,7 @@ export async function verifyLogtoToken(token: string, options: VerifyAuthOptions
     const jwk = findMatchingKey(keys, header.kid, header.alg)
 
     // Import the JWK for verification
-    const publicKey = await importJWK(jwk)
+    const publicKey = await importJWK(jwk, header?.alg || 'RS256')
 
     // Verify the JWT signature and get payload
     const { payload } = (await jwtVerify(token, publicKey)) as { payload: AuthPayload }
