@@ -1,10 +1,8 @@
 // Example Express.js server using @ouim/simple-logto/backend
 const express = require('express')
-const cookieParser = require('cookie-parser')
 const { createExpressAuthMiddleware } = require('@ouim/simple-logto/backend')
 
 const app = express()
-app.use(cookieParser())
 app.use(express.json())
 
 // Create the auth middleware

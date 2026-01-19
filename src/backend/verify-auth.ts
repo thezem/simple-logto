@@ -1,4 +1,5 @@
 import { importJWK, jwtVerify } from 'jose'
+import cookieParser from 'cookie-parser'
 import type { AuthContext, AuthPayload, VerifyAuthOptions, ExpressRequest, ExpressResponse, ExpressNext, NextRequest } from './types'
 
 // Cache for JWKs to avoid fetching on every request
@@ -225,7 +226,18 @@ const generateUUID = () => {
  * Express middleware for Logto authentication
  */
 export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
+  // Create cookie parser middleware once (not on every request)
+  const parseCookies = cookieParser()
+  
   return async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
+    // Parse cookies if not already parsed
+    // cookie-parser is synchronous and will set req.cookies immediately
+    if (req.cookies === undefined) {
+      parseCookies(req as any, res as any, () => {
+        // Cookie parsing is complete (synchronous operation)
+      })
+    }
+    
     try {
       // Try to get token from cookie first, then from Authorization header
       let token = extractTokenFromCookies(req.cookies, options.cookieName)
