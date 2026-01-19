@@ -35,6 +35,7 @@ const authMiddleware = createExpressAuthMiddleware({
 })
 
 // Use in your Express routes
+// Note: cookie-parser is automatically included in the middleware
 app.get('/protected', authMiddleware, (req, res) => {
   // req.auth contains the authenticated user info
   res.json({
