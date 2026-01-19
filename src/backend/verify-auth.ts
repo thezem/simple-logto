@@ -231,10 +231,8 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
   
   return async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
     // Parse cookies if not already parsed
-    if (!req.cookies) {
-      await new Promise<void>((resolve) => {
-        parseCookies(req as any, res as any, () => resolve())
-      })
+    if (req.cookies === undefined) {
+      parseCookies(req as any, res as any, () => {})
     }
     
     try {
