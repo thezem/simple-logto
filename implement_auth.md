@@ -152,7 +152,7 @@ Ensure `jose` works in your build environment by extending the provided config h
 
 ```js
 // vite.config.js
-import { viteConfig } from '@ouim/simple-logto'
+import { viteConfig } from '@ouim/simple-logto/bundler-config'
 export default { ...viteConfig }
 ```
 

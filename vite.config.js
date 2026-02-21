@@ -7,12 +7,18 @@ export default defineConfig({
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
         'backend/index': resolve(__dirname, 'src/backend/index.ts'),
+        // expose bundler helpers as a separate bundle so consumers
+        // can import them without pulling in the full React-based library
+        'bundler-config': resolve(__dirname, 'src/bundler-config.ts'),
       },
       name: 'BetterLogtoReact',
       formats: ['es', 'cjs'],
     },
     rollupOptions: {
-      external: ['react', 'react-dom', '@logto/react', 'jose'],
+      // react/jsx-runtime is used by TypeScript's automatic JSX transform
+      // and would otherwise be inlined into the build. mark it external so
+      // the runtime comes from the consumer's React package instead.
+      external: ['react', 'react-dom', '@logto/react', 'jose', 'react/jsx-runtime', 'react/jsx-dev-runtime'],
       output: {
         globals: {
           react: 'React',

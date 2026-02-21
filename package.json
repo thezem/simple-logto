@@ -1,6 +1,6 @@
 {
   "name": "@ouim/simple-logto",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A simpler way to use @logto/react with prebuilt UI components and hooks for fast authentication setup",
   "type": "module",
   "main": "dist/index.js",
@@ -19,6 +19,11 @@
       "import": "./dist/backend/index.js",
       "require": "./dist/backend/index.cjs",
       "types": "./dist/backend/index.d.ts"
+    },
+    "./bundler-config": {
+      "import": "./dist/bundler-config.js",
+      "require": "./dist/bundler-config.cjs",
+      "types": "./dist/bundler-config.d.ts"
     }
   },
   "browser": {

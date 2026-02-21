@@ -349,9 +349,11 @@ The library provides pre-configured bundler settings to resolve common issues wi
 
 ### Vite
 
+> **Tip:** when editing a Vite config or other build-time script, import directly from the `bundler-config` subpath. This avoids executing the main library bundle (which pulls in React and may trip over runtime internals during Node startup).
+
 ```javascript
 // vite.config.js
-import { viteConfig } from '@ouim/simple-logto'
+import { viteConfig } from '@ouim/simple-logto/bundler-config'
 
 export default {
   ...viteConfig,
@@ -386,7 +388,9 @@ module.exports = {
 ### Custom Configuration
 
 ```javascript
-import { getBundlerConfig } from '@ouim/simple-logto'
+// either import from the main entry (exports the whole library) or
+// pull the helpers alone via the dedicated path:
+import { getBundlerConfig } from '@ouim/simple-logto/bundler-config'
 
 // Get configuration for specific bundler
 const config = getBundlerConfig('vite') // 'vite' | 'webpack' | 'nextjs'
