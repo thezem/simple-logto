@@ -224,8 +224,13 @@ const generateUUID = () => {
 /**
  * Express middleware for Logto authentication
  */
+import cookieParser from 'cookie-parser'
+
 export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
-  return async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
+  // We wrap the actual logic in a handler so that we can ensure cookies are parsed
+  const parser = cookieParser()
+
+  const handler = async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
     try {
       // Try to get token from cookie first, then from Authorization header
       let token = extractTokenFromCookies(req.cookies, options.cookieName)
@@ -280,6 +285,20 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
         error: 'Authentication failed',
         message: error instanceof Error ? error.message : 'Unknown error',
       })
+    }
+  }
+
+  // Returned middleware ensures cookies are parsed if not already available
+  return (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
+    if (!req.cookies) {
+      parser(req as any, res as any, (err: any) => {
+        if (err) {
+          return next(err)
+        }
+        handler(req, res, next)
+      })
+    } else {
+      handler(req, res, next)
     }
   }
 }

@@ -32,7 +32,7 @@ export interface ExpressResponse {
   json: (obj: any) => ExpressResponse
 }
 
-export type ExpressNext = () => void
+export type ExpressNext = (err?: any) => void
 
 // Next.js types
 export interface NextRequest {

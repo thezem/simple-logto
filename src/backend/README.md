@@ -24,6 +24,8 @@ npm install @ouim/simple-logto
 
 ### Express.js Middleware
 
+`createExpressAuthMiddleware` automatically parses cookies for you so there's no need to install or `app.use` a separate `cookie-parser` middleware. Just import and mount the helper as shown below.
+
 ```javascript
 import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend'
 

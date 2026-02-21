@@ -199,6 +199,8 @@ function MixedContent() {
 
 ## Backend Authentication
 
+> **Note:** Express middleware now includes built-in cookie parsing. You don’t need to install or call `cookie-parser` yourself anymore.
+
 The library includes powerful backend authentication helpers for Node.js applications.
 
 ### Installation
