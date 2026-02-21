@@ -1,5 +1,9 @@
 import { importJWK, jwtVerify } from 'jose'
 import type { AuthContext, AuthPayload, VerifyAuthOptions, ExpressRequest, ExpressResponse, ExpressNext, NextRequest } from './types'
+/**
+ * Express middleware for Logto authentication
+ */
+import cookieParser from 'cookie-parser'
 
 // Cache for JWKs to avoid fetching on every request
 const jwksCache = new Map<string, { keys: any[]; expires: number }>()
@@ -220,11 +224,6 @@ const generateUUID = () => {
     return v.toString(16)
   })
 }
-
-/**
- * Express middleware for Logto authentication
- */
-import cookieParser from 'cookie-parser'
 
 export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
   // We wrap the actual logic in a handler so that we can ensure cookies are parsed
