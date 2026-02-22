@@ -1,7 +1,7 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { LogtoConfig, LogtoProvider, useLogto } from '@logto/react'
-import { transformUser, setCustomNavigate, jwtCookieUtils, guestUtils } from './utils'
+import { transformUser, setCustomNavigate, jwtCookieUtils, guestUtils, validateLogtoConfig } from './utils'
 import type { AuthContextType, AuthProviderProps, LogtoUser } from './types'
 
 // Create auth context
@@ -192,8 +192,8 @@ const InternalAuthProvider = ({
         await logtoSignIn(redirectUrl)
       } else {
         // Use popup sign-in
-        const popupWidth = 400
-        const popupHeight = 600
+        const popupWidth = 500
+        const popupHeight = 770
         const left = window.innerWidth / 2 - popupWidth / 2
         const top = window.innerHeight / 2 - popupHeight / 2
         const popupFeatures = `width=${popupWidth},height=${popupHeight},left=${left},top=${top},resizable=yes,scrollbars=yes,status=yes`
@@ -286,6 +286,11 @@ const InternalAuthProvider = ({
 
 // External provider that wraps Logto's provider
 export const AuthProvider = ({ children, config, callbackUrl, customNavigate, enablePopupSignIn = false }: AuthProviderProps) => {
+  // Validate configuration on mount
+  useEffect(() => {
+    validateLogtoConfig(config)
+  }, [config])
+
   // Set the custom navigate function for the entire library
   useEffect(() => {
     setCustomNavigate(customNavigate || null)

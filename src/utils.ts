@@ -2,6 +2,67 @@ import { type ClassValue, clsx } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import type { LogtoUser, NavigationOptions } from './types'
 import FingerprintJS from '@fingerprintjs/fingerprintjs'
+import type { LogtoConfig } from '@logto/react'
+
+/**
+ * Validates Logto configuration for required fields
+ * @param config - The LogtoConfig object to validate
+ * @throws {Error} If required configuration is missing or invalid
+ * @example
+ * try {
+ *   validateLogtoConfig(config);
+ * } catch (error) {
+ *   console.error('Invalid Logto config:', error.message);
+ * }
+ */
+export const validateLogtoConfig = (config: LogtoConfig): void => {
+  if (!config) {
+    throw new Error('Logto configuration is required. Please provide a valid LogtoConfig object to AuthProvider.')
+  }
+
+  const errors: string[] = []
+
+  // Check for endpoint (logtoUrl)
+  if (!config.endpoint) {
+    errors.push('`endpoint` (Logto URL) is required in configuration')
+  } else if (typeof config.endpoint !== 'string' || config.endpoint.trim() === '') {
+    errors.push('`endpoint` must be a non-empty string')
+  } else {
+    // Validate it's a valid URL
+    try {
+      new URL(config.endpoint)
+    } catch {
+      errors.push('`endpoint` must be a valid URL (e.g., "https://your-tenant.logto.app")')
+    }
+  }
+
+  // Check for appId
+  if (!config.appId) {
+    errors.push('`appId` is required in configuration')
+  } else if (typeof config.appId !== 'string' || config.appId.trim() === '') {
+    errors.push('`appId` must be a non-empty string')
+  }
+
+  // Optional: Check for resources (audience) - log warning if not present
+  // This is optional because some apps might not need it
+  if (!config.resources || Object.keys(config.resources).length === 0) {
+    console.warn(
+      'Warning: No `resources` configured in Logto config. ' +
+        'If you need to access protected backend APIs with JWTs, ensure at least one resource is configured. ' +
+        'See: https://docs.logto.io/docs/recipes/configure-jwt-token',
+    )
+  }
+
+  if (errors.length > 0) {
+    const errorMessage =
+      'Invalid Logto configuration:\n' +
+      errors.map((e, i) => `  ${i + 1}. ${e}`).join('\n') +
+      '\n\nPlease check your AuthProvider config. ' +
+      'Example: <AuthProvider config={{ endpoint: "https://your-tenant.logto.app", appId: "your-app-id", resources: {...} }}>'
+
+    throw new Error(errorMessage)
+  }
+}
 
 /**
  * Transform Logto user object to a simpler format

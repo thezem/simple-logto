@@ -4,7 +4,7 @@
 
 - [ ] **Add CSRF protection to backend middleware** - Missing CSRF token validation in Express/Next.js middleware could expose to CSRF attacks. Add CSRF protection helpers.
 - [ ] **Implement rate limiting for JWT verification** - Backend endpoints lack rate limiting. Add rate limiting helpers for Express/Next.js to prevent abuse.
-- [ ] **Add runtime validation of auth config** - `AuthProvider` config validation is missing. Validate `logtoUrl`, `appId`, `audience` at initialization to catch misconfigurations early.
+- [x] **Add runtime validation of auth config** - `AuthProvider` config validation is missing. Validate `logtoUrl`, `appId`, `audience` at initialization to catch misconfigurations early.
 - [ ] **Improve error recovery in auth context** - The rate limiting logic in `context.tsx` (MAX_ERROR_COUNT) might mask real auth failures. Implement better error categorization and recovery strategies.
 - [ ] **Add input sanitization for JWT claims** - No validation of claim values before using them. Add schema validation for JWT payload claims.
 
