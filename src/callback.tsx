@@ -36,25 +36,43 @@ export const CallbackPage: React.FC<CallbackPageProps> = ({ className = '', load
     callbackHandled.current = true
 
     try {
-      // Detect if this window was opened by another window (popup flow)
-      const isPopup = window.opener && window.opener !== window
+      // Detect if this window was opened by another window (popup flow).
+      // window.opener may be cleared by some browsers after cross-origin navigation,
+      // so also check the sessionStorage flag set by SignInPage.
+      const isPopup = (window.opener && window.opener !== window) || sessionStorage.getItem('simple_logto_popup_flow') === 'true'
+
+      console.log({ isPopup })
 
       if (onSuccess) {
         onSuccess()
+      }
+      // If not a popup, redirect to the home page or a specific URL
+      if (!isPopup) {
+        window.location.href = '/'
       } else {
-        // If not a popup, redirect to the home page or a specific URL
-        if (!isPopup) {
-          window.location.href = '/'
-        } else {
-          // Send message to parent window before closing
-          if (window.opener && window.opener !== window) {
+        // Clean up the popup flag before closing
+        sessionStorage.removeItem('simple_logto_popup_flow')
+
+        // Send message to parent window before closing
+        if (window.opener && window.opener !== window) {
+          try {
             window.opener.postMessage({ type: 'SIGNIN_SUCCESS' }, window.location.origin)
+          } catch (e) {
+            console.error('Failed to post message to opener:', e)
+            // Use fallback method
+            localStorage.setItem('simple_logto_signin_complete', Date.now().toString())
           }
-          // Small delay to ensure message is sent before closing
-          setTimeout(() => {
-            window.close()
-          }, 100)
+        } else {
+          // opener reference lost – broadcast via localStorage so the parent tab picks it up
+          localStorage.setItem('simple_logto_signin_complete', Date.now().toString())
         }
+
+        // Small delay to ensure message is sent before closing
+        console.log('[CallbackPage] Attempting to close popup')
+        setTimeout(() => {
+          window.close()
+          console.log('[CallbackPage] Close popup called')
+        }, 100)
       }
     } catch (error) {
       console.error('Authentication callback error:', error)
