@@ -10,6 +10,27 @@
 
 ## 🟠 High Priority (Quality & Core Features)
 
+- [ ] **Clarify and improve `signIn()` API design** - The `signIn(callbackUrl?, usePopup?)` function from `useAuth` hook has unclear behavior:
+  - Competing with `enablePopupSignIn` prop on `AuthProvider` - which takes precedence?
+  - `usePopup` parameter is unclear - should users pass this? When? Why?
+  - No exported `SignInButton` component for basic usage (users must manually call `signIn()`)
+  - Should consider simplified API: `signIn()` with no params, or `signIn(options: { popup?, redirectUri? })`
+
+- [ ] **SignInPage component is too specific and auto-executing** - The exported `SignInPage` component automatically calls `signIn()` on mount, making it a route-handler rather than a flexible component:
+  - Only useful for popup flow control, not for rendering a custom sign-in UI
+  - Should either be an internal route handler or made more flexible with props
+  - Consider if this should be documented as a special route requirement instead
+
+- [ ] **Document implicit route requirements** - The sign-in flow implicitly expects `/signin` and `/callback` routes to exist:
+  - Not documented where these routes should be set up
+  - No guidance for Next.js Pages vs App Router, React Router, etc.
+  - Consider creating `useSignInRoute` and `useCallbackRoute` hooks or configuration helpers
+
+- [ ] **Add simple sign-in button component** - Create a built-in `SignInButton` component or export an easy-to-use helper:
+  - Simple one-liner for the most common use case: `<SignInButton />`
+  - Should work with both redirect and popup flows
+  - Current approach requires knowledge of the internal signIn API
+
 - [ ] **Comprehensive test suite** - Only 3 trivial tests exist. Add unit tests for:
   - Auth context provider initialization and state management
   - JWT verification logic (JWKS fetch, token validation, cache)
@@ -21,6 +42,10 @@
 - [ ] **Add JSDoc/TypeScript documentation** - Most functions lack documentation. Add JSDoc comments to all exported functions with examples.
 - [ ] **Implement token refresh mechanism** - Current implementation doesn't handle token expiration gracefully. Add automatic token refresh before expiration.
 - [ ] **Add role-based access control (RBAC) helpers** - No RBAC support in backend middleware. Create authorization helpers for common RBAC patterns.
+- [ ] **Fix potential infinite render in SignInPage** - The component uses `signInCalled.current` ref to prevent re-calling `signIn()`, but combined with `isPopup` state set in another effect, could cause timing issues:
+  - Consider using a single effect to detect popup and call signIn atomically
+  - Add guard against calling signIn if already in progress (similar to `SignInCalled` but earlier)
+
 - [ ] **Fix potential infinite render in CallbackPage** - The `useHandleSignInCallback` callback checks `isPopup` state set in another effect; could cause timing issues.
 - [ ] **Add support for custom error boundaries** - Frontend components don't provide error boundaries. Add error boundary wrapper or guidance.
 
@@ -32,6 +57,7 @@
   - Callback infinite redirects
   - Guest mode fingerprint errors
   - Hydration mismatches in SSR
+  - Popup vs redirect sign-in flow - when to use each, setup required for each
 
 - [ ] **Add migration guide from other auth libraries** - Help users migrate from Auth0, Firebase, etc.
 - [ ] **Document guest mode fully** - Add examples and explain fingerprinting, limitations, and use cases.
