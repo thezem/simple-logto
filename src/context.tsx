@@ -349,6 +349,45 @@ const InternalAuthProvider = ({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
 
+/**
+ * AuthProvider Component
+ *
+ * Main authentication provider that wraps your application with Logto authentication.
+ * Sets up authentication context, handles sign-in/sign-out flows, and manages auth state.
+ *
+ * @component
+ * @param {React.ReactNode} children - React components to wrap with authentication context
+ * @param {LogtoConfig} config - Logto configuration object containing endpoint, appId, and resources
+ * @param {string} [callbackUrl] - Default URL to redirect to after authentication (e.g., '/dashboard'). Can be overridden per sign-in call
+ * @param {Function} [customNavigate] - Custom navigation function for client-side routing (e.g., from React Router or Next.js). If not provided, uses window.location
+ * @param {boolean} [enablePopupSignIn=false] - Enable popup-based sign-in flow (opens sign-in in a new window). Defaults to redirect flow
+ *
+ * @example
+ * // Basic setup with Logto configuration
+ * <AuthProvider config={{ endpoint: 'https://tenant.logto.app', appId: 'app_id_here', resources: { api: 'urn:logto:resource:api' } }}>
+ *   <App />
+ * </AuthProvider>
+ *
+ * @example
+ * // With custom React Router navigation
+ * import { useNavigate } from 'react-router-dom'
+ *
+ * function AuthProviderWrapper({ children }) {
+ *   const navigate = useNavigate()
+ *   return (
+ *     <AuthProvider
+ *       config={logtoConfig}
+ *       callbackUrl="/dashboard"
+ *       enablePopupSignIn={true}
+ *       customNavigate={(url) => navigate(url)}
+ *     >
+ *       {children}
+ *     </AuthProvider>
+ *   )
+ * }
+ *
+ * @throws {Error} If required Logto configuration is missing or invalid (endpoint, appId)
+ */
 // External provider that wraps Logto's provider
 export const AuthProvider = ({ children, config, callbackUrl, customNavigate, enablePopupSignIn = false }: AuthProviderProps) => {
   // Validate configuration on mount
@@ -375,6 +414,18 @@ export const AuthProvider = ({ children, config, callbackUrl, customNavigate, en
   )
 }
 
+/**
+ * useAuthContext Hook (Internal)
+ *
+ * Internal hook to access the authentication context. Not exported directly.
+ * Use the exported {@link useAuth} hook instead for the public API.
+ *
+ * @internal
+ * @returns {AuthContextType} Authentication context with user, loading state, and auth functions
+ * @throws {Error} If used outside of AuthProvider context
+ *
+ * @see {@link useAuth} for the public API to access auth context
+ */
 // Hook to use the auth context
 export const useAuthContext = (): AuthContextType => {
   const context = useContext(AuthContext)

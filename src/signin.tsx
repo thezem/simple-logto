@@ -3,6 +3,42 @@ import { useEffect, useRef } from 'react'
 import { useAuth } from './useAuth'
 import LoadingSpinner from './components/ui/loading-spinner'
 
+/**
+ * SignInPage Component
+ *
+ * Internal page component that auto-initiates the sign-in flow. This is a special route
+ * that automatically starts the Logto sign-in process when loaded.
+ *
+ * In redirect flow:
+ * - If user is not authenticated, initiates sign-in redirect to Logto
+ * - User is redirected back to /callback after Logto authentication
+ * - Redirects to home page on success
+ *
+ * In popup flow (when opened from parent with ?popup=true):
+ * - Detects it's running in a popup (via window.opener or sessionStorage flag)
+ * - Initiates sign-in without opening nested popups
+ * - Notifies parent window via postMessage when complete
+ * - Self-closes the popup
+ *
+ * @component
+ *
+ * @example
+ * // Set up route for the sign-in page
+ * // In Next.js or React Router
+ * <Route path="/signin" component={SignInPage} />
+ *
+ * // AuthProvider with popup sign-in enabled
+ * <AuthProvider config={logtoConfig} enablePopupSignIn={true}>
+ *   <App />
+ * </AuthProvider>
+ *
+ * @returns {React.ReactElement|null} Loading spinner during auth, null otherwise
+ *
+ * @see {@link CallbackPage} for the callback handler page
+ * @see {@link SignInButton} for a button component to trigger sign-in
+ *
+ * @internal
+ */
 export function SignInPage() {
   const { user, signIn, isLoadingUser } = useAuth()
   const signInInProgress = useRef(false)

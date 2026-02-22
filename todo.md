@@ -36,7 +36,7 @@
   - CallbackPage handling both popup and redirect flows
   - UserCenter component rendering states
 
-- [ ] **Add JSDoc/TypeScript documentation** - Most functions lack documentation. Add JSDoc comments to all exported functions with examples.
+- [x] **Add JSDoc/TypeScript documentation** - Most functions lack documentation. Add JSDoc comments to all exported functions with examples.
 - [ ] **Implement token refresh mechanism** - Current implementation doesn't handle token expiration gracefully. Add automatic token refresh before expiration.
 - [ ] **Add role-based access control (RBAC) helpers** - No RBAC support in backend middleware. Create authorization helpers for common RBAC patterns.
 - [x] **Fix potential infinite render in SignInPage** - The component uses `signInCalled.current` ref to prevent re-calling `signIn()`, but combined with `isPopup` state set in another effect, could cause timing issues:

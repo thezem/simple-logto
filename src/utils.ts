@@ -65,7 +65,21 @@ export const validateLogtoConfig = (config: LogtoConfig): void => {
 }
 
 /**
- * Transform Logto user object to a simpler format
+ * Transform Logto User Object
+ *
+ * Converts a Logto JWT claims object into a simplified LogtoUser format.
+ * Maps JWT standard claims (sub, name, email, picture) to user object properties,
+ * and preserves all additional claims from the original object.
+ *
+ * @param {any} logtoUser - Raw Logto user claims object from JWT token
+ * @returns {LogtoUser | null} Simplified user object or null if input is falsy
+ *
+ * @example
+ * const claims = { sub: 'user_123', name: 'John Doe', email: 'john@example.com', picture: 'http://...' };
+ * const user = transformUser(claims);
+ * // { id: 'user_123', name: 'John Doe', email: 'john@example.com', avatar: 'http://...' }
+ *
+ * @internal
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const transformUser = (logtoUser: any): LogtoUser | null => {
@@ -85,15 +99,56 @@ export const transformUser = (logtoUser: any): LogtoUser | null => {
 let customNavigateFunction: ((url: string, options?: NavigationOptions) => void) | null = null
 
 /**
- * Set a custom navigation function (used by AuthProvider)
+ * Set Custom Navigation Function
+ *
+ * Registers a custom navigation handler for the entire auth library.
+ * Used by AuthProvider to enable integration with client-side routers like React Router.
+ * If not set, the library falls back to window.location for navigation.
+ *
+ * @param {Function | null} navigateFn - Navigation function with signature (url: string, options?: NavigationOptions) => void
+ *                                        or null to clear the custom function
+ * @internal
+ *
+ * @example
+ * import { useNavigate } from 'react-router-dom';
+ * import { setCustomNavigate } from '@ouim/simple-logto';
+ *
+ * // Inside a context or app component
+ * const navigate = useNavigate();
+ * setCustomNavigate((url) => navigate(url));
  */
 export const setCustomNavigate = (navigateFn: ((url: string, options?: NavigationOptions) => void) | null) => {
   customNavigateFunction = navigateFn
 }
 
 /**
- * Navigate to a URL, handling both client-side routing and direct navigation
- * Attempts to use client-side routing first (History API), then falls back to window.location
+ * Navigate to a URL
+ *
+ * Universal navigation function that attempts client-side routing first (History API),
+ * then falls back to direct window.location navigation. Respects custom navigation functions
+ * set via setCustomNavigate for router integration.
+ *
+ * Supports:
+ * - Custom routers (React Router, Next.js navigation, etc.) via setCustomNavigate
+ * - Client-side History API for SPAs (pushState/replaceState)
+ * - Direct window.location for absolute URLs and fallback
+ *
+ * @param {string} url - URL to navigate to (relative path like '/dashboard' or absolute URL)
+ * @param {NavigationOptions} [options={}] - Navigation behavior options
+ * @param {boolean} [options.replace=false] - Use replaceState instead of pushState (replaces history entry)
+ * @param {boolean} [options.force=false] - Force navigation even if already on the same page
+ *
+ * @example
+ * // Navigate to a relative path
+ * navigateTo('/dashboard');
+ *
+ * @example
+ * // Replace history entry instead of adding new one
+ * navigateTo('/login', { replace: true });
+ *
+ * @example
+ * // Force navigation even if already on the page
+ * navigateTo('/dashboard', { force: true });
  */
 export const navigateTo = (url: string, options: NavigationOptions = {}): void => {
   try {

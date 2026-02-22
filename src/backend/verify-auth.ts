@@ -175,7 +175,37 @@ function verifyTokenClaims(payload: any, options: VerifyAuthOptions): void {
 }
 
 /**
- * Verify JWT token from Logto
+ * Verify JWT Token from Logto
+ *
+ * Verifies a Logto JWT token by:
+ * 1. Decoding the JWT header to extract key ID (kid) and algorithm
+ * 2. Fetching the JWKS (JSON Web Key Set) from Logto's OIDC endpoint
+ * 3. Finding the matching public key
+ * 4. Verifying the token signature
+ * 5. Validating all claims (issuer, audience, expiration, scope, etc.)
+ *
+ * @param {string} token - The JWT token to verify (typically from Authorization header or cookie)
+ * @param {VerifyAuthOptions} options - Verification options
+ * @param {string} options.logtoUrl - Logto server URL (e.g., 'https://tenant.logto.app')
+ * @param {string} [options.audience] - Expected token audience (resource/API identifier)
+ * @param {string} [options.requiredScope] - Required scope that must be present in token
+ * @param {string} [options.cookieName] - Cookie name for token storage (default: 'logto_authtoken')
+ * @param {boolean} [options.allowGuest] - Allow unauthenticated guest access
+ *
+ * @returns {Promise<AuthContext>} Authentication context with user ID, authentication status, and token payload
+ *
+ * @example
+ * try {
+ *   const auth = await verifyLogtoToken(token, {
+ *     logtoUrl: 'https://tenant.logto.app',
+ *     audience: 'urn:logto:resource:api'
+ *   });
+ *   console.log(auth.userId); // User ID from token
+ * } catch (error) {
+ *   console.error('Token verification failed:', error.message);
+ * }
+ *
+ * @throws {Error} If token format is invalid, signature verification fails, or claims validation fails
  */
 export async function verifyLogtoToken(token: string, options: VerifyAuthOptions): Promise<AuthContext> {
   const { logtoUrl } = options
@@ -225,6 +255,59 @@ const generateUUID = () => {
   })
 }
 
+/**
+ * Create Express Middleware for Logto Authentication
+ *
+ * Creates Express middleware that automatically extracts and verifies Logto JWT tokens
+ * from incoming requests. Handles token extraction from cookies or Authorization headers,
+ * validates tokens, and attaches authentication context to the request object.
+ *
+ * @param {VerifyAuthOptions} options - Middleware configuration options
+ * @param {string} options.logtoUrl - Logto server URL
+ * @param {string} [options.audience] - Expected token audience
+ * @param {string} [options.requiredScope] - Required scope
+ * @param {string} [options.cookieName='logto_authtoken'] - Cookie name for token
+ * @param {boolean} [options.allowGuest=false] - Allow unauthenticated access as guest
+ *
+ * @returns {Function} Express middleware function
+ *
+ * @example
+ * import express from 'express';
+ * import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend';
+ *
+ * const app = express();
+ *
+ * // Apply middleware to all routes
+ * app.use(createExpressAuthMiddleware({
+ *   logtoUrl: process.env.LOGTO_ENDPOINT,
+ *   audience: 'urn:logto:resource:api'
+ * }));
+ *
+ * // Access authenticated user
+ * app.get('/api/me', (req, res) => {
+ *   if (req.auth?.isAuthenticated) {
+ *     res.json({ userId: req.auth.userId });
+ *   } else {
+ *     res.status(401).json({ error: 'Unauthorized' });
+ *   }
+ * });
+ *
+ * @example
+ * // Allow guest access
+ * app.use(createExpressAuthMiddleware({
+ *   logtoUrl: process.env.LOGTO_ENDPOINT,
+ *   allowGuest: true
+ * }));
+ *
+ * // Distinguish authenticated vs guest users
+ * app.get('/api/data', (req, res) => {
+ *   if (req.auth?.isGuest) {
+ *     res.json({ data: 'limited data for guests' });
+ *   } else {
+ *     res.json({ data: 'full data for authenticated users' });
+ *   }
+ * });
+ */
 export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
   // We wrap the actual logic in a handler so that we can ensure cookies are parsed
   const parser = cookieParser()
@@ -303,7 +386,60 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
 }
 
 /**
- * Next.js middleware for Logto authentication
+ * Verify Next.js Request Authentication
+ *
+ * Verifies Logto authentication for Next.js API routes and middleware.
+ * Extracts JWT from cookies or Authorization header, verifies the token,
+ * and returns authentication context.
+ *
+ * @param {NextRequest} request - Next.js request object
+ * @param {VerifyAuthOptions} options - Verification options
+ * @param {string} options.logtoUrl - Logto server URL
+ * @param {string} [options.audience] - Expected token audience
+ * @param {string} [options.requiredScope] - Required scope
+ * @param {string} [options.cookieName='logto_authtoken'] - Cookie name
+ * @param {boolean} [options.allowGuest] - Allow unauthenticated guest access
+ *
+ * @returns {Promise<{success: true, auth: AuthContext} | {success: false, error: string, auth?: AuthContext}>}
+ * Object containing success flag, auth context, and error message if verification fails
+ *
+ * @example
+ * // In a Next.js API route
+ * import { verifyNextAuth } from '@ouim/simple-logto/backend';
+ *
+ * export async function GET(request) {
+ *   const result = await verifyNextAuth(request, {
+ *     logtoUrl: process.env.LOGTO_ENDPOINT,
+ *     audience: 'urn:logto:resource:api'
+ *   });
+ *
+ *   if (!result.success) {
+ *     return new Response(JSON.stringify({ error: result.error }), { status: 401 });
+ *   }
+ *
+ *   return new Response(JSON.stringify({
+ *     userId: result.auth.userId,
+ *     authenticated: result.auth.isAuthenticated
+ *   }));
+ * }
+ *
+ * @example
+ * // In Next.js middleware
+ * import { NextRequest, NextResponse } from 'next/server';
+ * import { verifyNextAuth } from '@ouim/simple-logto/backend';
+ *
+ * export async function middleware(request: NextRequest) {
+ *   const result = await verifyNextAuth(request, {
+ *     logtoUrl: process.env.LOGTO_ENDPOINT,
+ *     allowGuest: true
+ *   });
+ *
+ *   if (result.success && result.auth.isAuthenticated) {
+ *     return NextResponse.next();
+ *   }
+ *
+ *   return NextResponse.redirect(new URL('/login', request.url));
+ * }
  */
 export async function verifyNextAuth(
   request: NextRequest,
@@ -377,7 +513,39 @@ export async function verifyNextAuth(
 }
 
 /**
- * Generic verification function that can be used in any Node.js environment
+ * Generic Token/Request Authentication Verification
+ *
+ * Universal verification function that works with any Node.js environment.
+ * Accepts either a JWT token string directly or a request object (Express, Next.js, etc.)
+ * and verifies the authentication.
+ *
+ * @param {string | {cookies?: any, headers?: any}} tokenOrRequest - Either:
+ *   - A JWT token string to verify directly
+ *   - A request-like object with cookies and headers properties
+ * @param {VerifyAuthOptions} options - Verification options
+ * @param {string} options.logtoUrl - Logto server URL
+ * @param {string} [options.audience] - Expected token audience
+ * @param {string} [options.requiredScope] - Required scope
+ * @param {string} [options.cookieName='logto_authtoken'] - Cookie name
+ * @param {boolean} [options.allowGuest] - Allow unauthenticated guest access
+ *
+ * @returns {Promise<AuthContext>} Authentication context
+ *
+ * @example
+ * // Verify a token directly
+ * const auth = await verifyAuth(jwtToken, {
+ *   logtoUrl: 'https://tenant.logto.app',
+ *   audience: 'urn:logto:resource:api'
+ * });
+ *
+ * @example
+ * // Verify from a request object
+ * const auth = await verifyAuth(request, {
+ *   logtoUrl: process.env.LOGTO_ENDPOINT,
+ *   allowGuest: true
+ * });
+ *
+ * @throws {Error} If token verification fails or no token found and guest mode disabled
  */
 export async function verifyAuth(
   tokenOrRequest: string | { cookies?: any; headers?: any },

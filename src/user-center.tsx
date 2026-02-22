@@ -15,6 +15,45 @@ import {
 import { Button } from './components/ui/button'
 import type { AdditionalPage } from './types'
 
+/**
+ * UserCenter Component
+ *
+ * User profile and account management dropdown component. Displays the current user's
+ * avatar and name in a dropdown menu with sign-out and additional custom pages.
+ *
+ * Features:
+ * - Displays user avatar with fallback initials
+ * - Dropdown menu with user options
+ * - Sign-out functionality with configurable redirect
+ * - Support for additional custom pages/links
+ * - Dark mode support
+ * - Prevents hydration issues with client-only rendering
+ *
+ * @component
+ * @param {string} [className] - CSS classes for the container element
+ * @param {boolean} [globalSignOut=true] - Whether to perform global sign-out (logs out of entire Logto ecosystem) or local only
+ * @param {string} [signoutCallbackUrl] - URL to redirect to after sign-out (default: current page)
+ * @param {AdditionalPage[]} [additionalPages] - Array of custom pages/links to show in dropdown
+ * @param {string} [themeClassnames] - Tailwind classnames for theming (light/dark mode)
+ *
+ * @example
+ * // Basic user center
+ * <UserCenter />
+ *
+ * @example
+ * // With custom pages and dark mode
+ * <UserCenter
+ *   globalSignOut={false}
+ *   signoutCallbackUrl="/"
+ *   additionalPages={[
+ *     { link: '/settings', text: 'Settings', icon: <Settings /> },
+ *     { link: '/profile', text: 'Profile' }
+ *   ]}
+ *   themeClassnames="dark:bg-slate-900 dark:text-white bg-gray-50 text-gray-900"
+ * />
+ *
+ * @returns {React.ReactElement} Dropdown component with user profile
+ */
 export interface UserCenterProps {
   className?: string
   globalSignOut?: boolean

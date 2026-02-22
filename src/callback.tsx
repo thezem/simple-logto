@@ -2,6 +2,39 @@
 import React, { useEffect, useRef } from 'react'
 import { useHandleSignInCallback } from '@logto/react'
 
+/**
+ * CallbackPage Component
+ *
+ * Handles the OAuth callback after user authentication. This page is automatically
+ * redirected to by Logto after successful sign-in. Exchanges the auth code for tokens
+ * and handles both redirect and popup sign-in flows.
+ *
+ * For redirect flow: Displays loading state, then redirects to home or specified callback URL.
+ * For popup flow: Exchanges code, notifies parent window via postMessage, then closes popup.
+ *
+ * @component
+ * @param {string} [className] - CSS classes to apply to the container
+ * @param {React.ReactNode} [loadingComponent] - Custom loading component (default: spinning loader)
+ * @param {React.ReactNode} [successComponent] - Custom success component to display after callback
+ * @param {Function} [onSuccess] - Optional callback invoked on successful authentication
+ * @param {Function} [onError] - Optional callback invoked if authentication fails, receives error argument
+ *
+ * @example
+ * // Basic usage - route handler that shows loading state
+ * // In your router, set up a /callback route:
+ * <Route path="/callback" component={CallbackPage} />
+ *
+ * @example
+ * // With custom loading component
+ * <CallbackPage
+ *   loadingComponent={<div>Completing sign-in...</div>}
+ *   onSuccess={() => console.log('Auth successful!')}
+ *   onError={(error) => console.error('Auth failed:', error)}
+ * />
+ *
+ * @returns {React.FC} Component that handles the auth callback flow
+ * @see {@link SignInPage} for the sign-in page component
+ */
 export interface CallbackPageProps {
   className?: string
   loadingComponent?: React.ReactNode
