@@ -26,10 +26,7 @@
   - No guidance for Next.js Pages vs App Router, React Router, etc.
   - Consider creating `useSignInRoute` and `useCallbackRoute` hooks or configuration helpers
 
-- [ ] **Add simple sign-in button component** - Create a built-in `SignInButton` component or export an easy-to-use helper:
-  - Simple one-liner for the most common use case: `<SignInButton />`
-  - Should work with both redirect and popup flows
-  - Current approach requires knowledge of the internal signIn API
+- [x] **Add simple sign-in button component** - ✅ Created `SignInButton` component with support for customizable labels, redirect URIs, popup flow, and callbacks. Exported in public API.
 
 - [ ] **Comprehensive test suite** - Only 3 trivial tests exist. Add unit tests for:
   - Auth context provider initialization and state management
