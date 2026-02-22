@@ -37,6 +37,8 @@
     "build": "vite build && tsc --emitDeclarationOnly",
     "build:tsc": "tsc",
     "dev": "tsc --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
     "publish": "npm publish --access public"
@@ -61,10 +63,15 @@
     "vitest": "^4.0.18"
   },
   "devDependencies": {
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/cookie-parser": "^1.4.10",
     "@types/node": "^22.15.30",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
+    "@vitest/ui": "^4.0.18",
+    "happy-dom": "^20.7.0",
     "typescript": "^5.0.4",
     "vite": "^4.0.0"
   },
