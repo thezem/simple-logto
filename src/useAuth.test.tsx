@@ -1,9 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import { ReactNode } from 'react'
 import { useAuth } from './useAuth'
 import { useAuthContext } from './context'
-import type { AuthOptions } from './types'
 
 // Mock useAuthContext
 vi.mock('./context', async () => {

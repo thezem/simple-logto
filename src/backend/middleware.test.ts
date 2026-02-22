@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createExpressAuthMiddleware, verifyNextAuth, verifyLogtoToken } from './verify-auth'
-import type { VerifyAuthOptions, AuthContext, ExpressRequest, ExpressResponse, ExpressNext } from './types'
+import type { VerifyAuthOptions, _AuthContext, _ExpressRequest, _ExpressResponse, _ExpressNext } from './types'
 
 // Mock jose library
 vi.mock('jose', () => ({
@@ -25,15 +25,15 @@ const mockOptions: VerifyAuthOptions = {
 }
 
 // Helper to wrap middleware execution and wait for completion
-const executeMiddleware = (middleware: any, req: any, res: any) => {
+const _executeMiddleware = (middleware: any, req: any, res: any) => {
   return new Promise<void>((resolve, reject) => {
     const nextFn = vi.fn(resolve)
 
     // If middleware calls next, it resolves
     // If res.status is called, we resolve after json is called
     const originalStatus = res.status
-    res.status = vi.fn(function (code: number) {
-      res.json = vi.fn((data: any) => {
+    res.status = vi.fn(function (_code: number) {
+      res.json = vi.fn((_data: any) => {
         resolve()
       })
       return this
@@ -91,19 +91,19 @@ describe('Express/Next.js Middleware Auth Flow', () => {
           headers: {},
         } as any
 
-        const res = {
+        const _res = {
           status: vi.fn().mockReturnThis(),
           json: vi.fn(),
         } as any
 
-        let nextCalled = false
+        let _nextCalled = false
         const testReq = req
         const testRes = {
           status: vi.fn().mockReturnThis(),
           json: vi.fn(),
         }
-        const nextFn = vi.fn(() => {
-          nextCalled = true
+        const _nextFn = vi.fn(() => {
+          _nextCalled = true
         })
 
         await new Promise<void>(resolve => {
@@ -127,16 +127,16 @@ describe('Express/Next.js Middleware Auth Flow', () => {
           },
         } as any
 
-        let nextCalled = false
+        let _nextCalled = false
         const testReq = req
         const testRes = { status: vi.fn().mockReturnThis(), json: vi.fn() }
-        const nextFn = vi.fn(() => {
-          nextCalled = true
+        const _nextFn = vi.fn(() => {
+          _nextCalled = true
         })
 
         await new Promise<void>(resolve => {
           middleware(testReq, testRes, () => {
-            nextCalled = true
+            _nextCalled = true
             resolve()
           })
           setTimeout(resolve, 50)
@@ -365,7 +365,7 @@ describe('Express/Next.js Middleware Auth Flow', () => {
           headers: {},
         } as any
 
-        let nextCalled = false
+        let _nextCalled = false
         const res = {
           status: vi.fn().mockReturnThis(),
           json: vi.fn(),
@@ -373,7 +373,7 @@ describe('Express/Next.js Middleware Auth Flow', () => {
 
         await new Promise<void>(resolve => {
           middleware(req, res, () => {
-            nextCalled = true
+            _nextCalled = true
             resolve()
           })
           setTimeout(resolve, 50)

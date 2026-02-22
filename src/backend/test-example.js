@@ -1,9 +1,9 @@
 // Simple test example for the Logto backend verification
 // This is not a real test file, just for demonstration
 
-const { verifyAuth } = require('@ouim/simple-logto/backend')
+import { verifyAuth } from '@ouim/simple-logto/backend'
 
-async function testVerification() {
+async function _testVerification() {
   try {
     // Example with a mock request object
     const mockRequest = {

@@ -1,8 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
-import { ReactNode } from 'react'
-import { UserCenter, UserCenterProps } from './user-center'
+import { render, screen } from '@testing-library/react'
+import { UserCenter } from './user-center'
 import type { LogtoUser } from './types'
 
 // Mock useAuth hook
@@ -131,7 +129,7 @@ describe('UserCenter Component', () => {
         isLoadingUser: false,
       })
 
-      const { container } = render(<UserCenter />)
+      const { container: _container } = render(<UserCenter />)
 
       // Component should use Avatar component when user is loaded
       const avatar = screen.getByTestId('avatar')

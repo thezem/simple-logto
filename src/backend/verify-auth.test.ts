@@ -59,7 +59,7 @@ describe('JWT Verification Logic', () => {
         }),
       })
 
-      const { importJWK, jwtVerify } = await import('jose')
+      const { importJWK: _importJWK, jwtVerify } = await import('jose')
       ;(jwtVerify as any).mockResolvedValueOnce({
         payload: {
           sub: 'user-123',

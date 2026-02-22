@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, waitFor, act } from '@testing-library/react'
-import { ReactNode, useState, useEffect, useRef } from 'react'
-import { CallbackPage, CallbackPageProps } from './callback'
+import { render, screen, waitFor, _act } from '@testing-library/react'
+import { useState, useEffect } from 'react'
+import { CallbackPage } from './callback'
 
 // Simple state management for the mock
-let mockState = { isLoading: true }
-const mockReset = () => {
-  mockState = { isLoading: true }
+let _mockState = { isLoading: true }
+const _mockReset = () => {
+  _mockState = { isLoading: true }
 }
 
 vi.mock('@logto/react', () => ({
@@ -272,7 +272,7 @@ describe('CallbackPage Component', () => {
 
   describe('CSS Keyframes Injection', () => {
     it('should inject spin keyframes once on mount', () => {
-      const { container } = render(<CallbackPage />)
+      const { container: _container } = render(<CallbackPage />)
 
       const styleElement = document.querySelector('#spin-keyframes')
       expect(styleElement).toBeTruthy()
@@ -338,7 +338,7 @@ describe('CallbackPage Component', () => {
       const { container } = render(<CallbackPage />)
 
       const textElements = container.querySelectorAll('div')
-      let foundText = false
+      const _foundText = false
 
       textElements.forEach(el => {
         if (el.textContent?.includes('Authentication complete')) {
