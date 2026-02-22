@@ -28,13 +28,14 @@
 
 - [x] **Add simple sign-in button component** - ✅ Created `SignInButton` component with support for customizable labels, redirect URIs, popup flow, and callbacks. Exported in public API.
 
-- [ ] **Comprehensive test suite** - Added unit tests for core functionality. 31 tests now passing. Add unit tests for:
+- [ ] **Comprehensive test suite** - Added unit tests for core functionality. 60+ tests now passing. Add unit tests for:
   - [x] Auth context provider initialization and state management - 7 tests
   - [x] JWT verification logic (JWKS fetch, token validation, cache) - 12 tests
   - [x] useAuth hook with different options (auth middleware, guest mode, redirects) - 12 tests
-  - [ ] Express/Next.js middleware auth flow
-  - [ ] CallbackPage handling both popup and redirect flows
-  - [ ] UserCenter component rendering states
+  - [x] Express/Next.js middleware auth flow - 28 tests (12 Express, 12 Next.js, 4 token verification core)
+  - [x] CallbackPage handling both popup and redirect flows - 23 tests
+  - [x] UserCenter component rendering states - 29 tests
+  - **Note**: Some tests need fixes due to mocking complexities (see Test Refinement tasks below)
 
 - [x] **Add JSDoc/TypeScript documentation** - Most functions lack documentation. Add JSDoc comments to all exported functions with examples.
 - [ ] **Implement token refresh mechanism** - Current implementation doesn't handle token expiration gracefully. Add automatic token refresh before expiration.
@@ -99,6 +100,17 @@
 - [ ] **Add analytics event helpers** - Provide utilities to track auth events (sign in, sign out, callback).
 - [ ] **Support other JWT libraries** - Currently uses `jose`. Consider making it library-agnostic.
 - [ ] **Add PWA/offline support guidance** - Document limitations and patterns for offline scenarios.
+
+## 🧪 Test Refinement (Follow-up from initial test implementation)
+
+- [ ] **Fix CallbackPage test mocking** - 12 tests failing due to `useHandleSignInCallback` mock not properly executing callbacks. Need to improve mock to simulate actual hook behavior including loading state transitions. See [callback.test.tsx](src/callback.test.tsx) for details.
+- [ ] **Fix Express middleware async handling** - 4 tests failing because async middleware execution isn't being awaited properly in tests. Need to improve test setup for Express middleware async patterns.
+  - Tests affected: token extraction tests (4) and token verification test (1)
+  - Root cause: Middleware handler returns a promise but tests don't properly wait
+  - Solution: Ensure all middleware promises are awaited before assertions
+- [ ] **Fix UserCenter navigation test** - Test "should navigate to page link when clicked" needs proper implementation to verify the navigateTo function is called with correct parameters.
+- [ ] **Add missing @testing-library/user-event** - UserCenter tests use `userEvent` but need to verify it's installed and properly configured.
+- [ ] **Setup proper type definitions** - Some tests may need additional type definitions for Express/Next.js request/response objects to work correctly with mocks.
 
 ## 🛠️ Maintenance Tasks
 

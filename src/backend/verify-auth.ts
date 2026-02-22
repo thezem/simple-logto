@@ -371,16 +371,16 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
   }
 
   // Returned middleware ensures cookies are parsed if not already available
-  return (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
+  return async (req: ExpressRequest, res: ExpressResponse, next: ExpressNext) => {
     if (!req.cookies) {
-      parser(req as any, res as any, (err: any) => {
+      parser(req as any, res as any, async (err: any) => {
         if (err) {
           return next(err)
         }
-        handler(req, res, next)
+        await handler(req, res, next)
       })
     } else {
-      handler(req, res, next)
+      await handler(req, res, next)
     }
   }
 }
