@@ -42,11 +42,11 @@
 - [ ] **Add JSDoc/TypeScript documentation** - Most functions lack documentation. Add JSDoc comments to all exported functions with examples.
 - [ ] **Implement token refresh mechanism** - Current implementation doesn't handle token expiration gracefully. Add automatic token refresh before expiration.
 - [ ] **Add role-based access control (RBAC) helpers** - No RBAC support in backend middleware. Create authorization helpers for common RBAC patterns.
-- [ ] **Fix potential infinite render in SignInPage** - The component uses `signInCalled.current` ref to prevent re-calling `signIn()`, but combined with `isPopup` state set in another effect, could cause timing issues:
+- [x] **Fix potential infinite render in SignInPage** - The component uses `signInCalled.current` ref to prevent re-calling `signIn()`, but combined with `isPopup` state set in another effect, could cause timing issues:
   - Consider using a single effect to detect popup and call signIn atomically
   - Add guard against calling signIn if already in progress (similar to `SignInCalled` but earlier)
 
-- [ ] **Fix potential infinite render in CallbackPage** - The `useHandleSignInCallback` callback checks `isPopup` state set in another effect; could cause timing issues.
+- [x] **Fix potential infinite render in CallbackPage** - The `useHandleSignInCallback` callback checks `isPopup` state set in another effect; could cause timing issues.
 - [ ] **Add support for custom error boundaries** - Frontend components don't provide error boundaries. Add error boundary wrapper or guidance.
 
 ## 🟡 Medium Priority (Documentation & UX)

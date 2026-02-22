@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useHandleSignInCallback } from '@logto/react'
 
 export interface CallbackPageProps {
@@ -19,7 +19,7 @@ const spinKeyframes = `
 `
 
 export const CallbackPage: React.FC<CallbackPageProps> = ({ className = '', loadingComponent, successComponent, onSuccess, onError }) => {
-  const [isPopup, setIsPopup] = useState(false)
+  const callbackHandled = useRef(false)
 
   useEffect(() => {
     if (!document.querySelector('#spin-keyframes')) {
@@ -30,17 +30,15 @@ export const CallbackPage: React.FC<CallbackPageProps> = ({ className = '', load
     }
   }, [])
 
-  useEffect(() => {
-    // Method 1: Check if window has an opener (opened by another window)
-    const hasOpener = window.opener && window.opener !== window
-
-    const isOpenedByScript = window.opener !== null && window.opener !== undefined
-
-    setIsPopup(hasOpener || isOpenedByScript)
-  }, [])
-
   const { isLoading } = useHandleSignInCallback(() => {
+    // Prevent executing callback multiple times
+    if (callbackHandled.current) return
+    callbackHandled.current = true
+
     try {
+      // Detect if this window was opened by another window (popup flow)
+      const isPopup = window.opener && window.opener !== window
+
       if (onSuccess) {
         onSuccess()
       } else {

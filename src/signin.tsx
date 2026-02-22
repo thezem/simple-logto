@@ -1,27 +1,21 @@
 'use client'
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAuth } from './useAuth'
 import LoadingSpinner from './components/ui/loading-spinner'
 
 export function SignInPage() {
   const { user, signIn, isLoadingUser } = useAuth()
-  const [isPopup, setIsPopup] = useState(false)
-  const signInCalled = useRef(false)
-
-  useEffect(() => {
-    // Method 1: Check if window has an opener (opened by another window)
-    const hasOpener = window.opener && window.opener !== window
-
-    const isOpenedByScript = window.opener !== null && window.opener !== undefined
-
-    setIsPopup(hasOpener || isOpenedByScript)
-  }, [])
+  const signInInProgress = useRef(false)
 
   useEffect(() => {
     if (isLoadingUser) return
 
+    // Detect if this window was opened by another window (popup flow)
+    const isPopup = window.opener && window.opener !== window
+
     if (user) {
-      if (isPopup && window.opener && window.opener !== window) {
+      // User is already authenticated - redirect or close popup
+      if (isPopup) {
         window.opener.postMessage({ type: 'SIGNIN_COMPLETE' }, window.location.origin)
         setTimeout(() => window.close(), 100)
       } else {
@@ -30,12 +24,13 @@ export function SignInPage() {
       return
     }
 
-    if (!signInCalled.current) {
-      signInCalled.current = true
-      // Pass false for usePopup parameter to prevent nested popups when already in a popup
+    // Initiate sign-in if not already in progress
+    if (!signInInProgress.current) {
+      signInInProgress.current = true
+      // Pass false to prevent nested popups when already in a popup
       signIn(undefined, false)
     }
-  }, [isPopup, user, isLoadingUser, signIn])
+  }, [user, isLoadingUser, signIn])
 
   if (isLoadingUser) {
     return (
