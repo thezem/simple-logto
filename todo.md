@@ -29,12 +29,12 @@
 - [x] **Add simple sign-in button component** - ✅ Created `SignInButton` component with support for customizable labels, redirect URIs, popup flow, and callbacks. Exported in public API.
 
 - [ ] **Comprehensive test suite** - Only 3 trivial tests exist. Add unit tests for:
-  - Auth context provider initialization and state management
-  - JWT verification logic (JWKS fetch, token validation, cache)
-  - Express/Next.js middleware auth flow
-  - useAuth hook with different options (auth middleware, guest mode, redirects)
-  - CallbackPage handling both popup and redirect flows
-  - UserCenter component rendering states
+  - [ ] Auth context provider initialization and state management
+  - [ ] JWT verification logic (JWKS fetch, token validation, cache)
+  - [ ] Express/Next.js middleware auth flow
+  - [ ] useAuth hook with different options (auth middleware, guest mode, redirects)
+  - [ ] CallbackPage handling both popup and redirect flows
+  - [ ] UserCenter component rendering states
 
 - [x] **Add JSDoc/TypeScript documentation** - Most functions lack documentation. Add JSDoc comments to all exported functions with examples.
 - [ ] **Implement token refresh mechanism** - Current implementation doesn't handle token expiration gracefully. Add automatic token refresh before expiration.
