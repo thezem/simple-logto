@@ -19,9 +19,11 @@
 
 **Priority: 🔴 Critical**
 
-- [ ] **1.1 — Move `vitest` to `devDependencies`** `vitest` is currently listed under `dependencies`, causing ~50+ MB of dev tooling to be installed in every consumer's `node_modules`. Move it to `devDependencies`.
+- [X] **1.1 — Move `vitest` to `devDependencies`** `vitest` is currently listed under `dependencies`, causing ~50+ MB of dev tooling to be installed in every consumer's `node_modules`. Move it to `devDependencies`.
+  > Removed `vitest` from `dependencies` and added it alongside `@vitest/ui` in `devDependencies`. The `@vitest/ui` sibling entry was already in devDeps, so this is now consistent.
 
-- [ ] **1.2 — Fix stale package name in `bundler-config.ts`** `getBundlerConfig()` returns a Vite `optimizeDeps.include` array containing `@ouim/better-logto-react` (the old package name). Any consumer spreading this config into their Vite config adds a non-existent package to their build. Replace with the current package name `@ouim/simple-logto` or remove entirely.
+- [X] **1.2 — Fix stale package name in `bundler-config.ts`** `getBundlerConfig()` returns a Vite `optimizeDeps.include` array containing `@ouim/better-logto-react` (the old package name). Any consumer spreading this config into their Vite config adds a non-existent package to their build. Replace with the current package name `@ouim/simple-logto` or remove entirely.
+  > Replaced `@ouim/better-logto-react` with `@ouim/simple-logto` in the `optimizeDeps.include` array inside the `vite` case of `getBundlerConfig()`. The stale name was the only occurrence in the file.
 
 - [ ] **1.3 — Fix React peer dependency range to include React 18** The `peerDependencies` range is `^17.0.0 || ^19.0.0`, skipping React 18. This produces npm warnings for the majority of current React users. Update to `^17.0.0 || ^18.0.0 || ^19.0.0`.
 
