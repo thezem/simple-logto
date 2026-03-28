@@ -186,9 +186,13 @@ function verifyTokenClaims(payload: AuthPayload, options: VerifyAuthOptions): vo
     throw new Error(`Invalid issuer. Expected: ${expectedIssuer}, Got: ${payload.iss}`)
   }
 
-  // Verify audience
-  if (audience && payload.aud !== audience) {
-    throw new Error(`Invalid audience. Expected: ${audience}, Got: ${payload.aud}`)
+  // Verify audience — RFC 7519 allows aud to be a string or a string array
+  if (audience) {
+    const aud = payload.aud
+    const isValid = Array.isArray(aud) ? aud.includes(audience) : aud === audience
+    if (!isValid) {
+      throw new Error(`Invalid audience. Expected: ${audience}, Got: ${Array.isArray(aud) ? JSON.stringify(aud) : aud}`)
+    }
   }
 
   // Verify expiration

@@ -28,7 +28,8 @@
 - [X] **1.3 — Fix React peer dependency range to include React 18** The `peerDependencies` range is `^17.0.0 || ^19.0.0`, skipping React 18. This produces npm warnings for the majority of current React users. Update to `^17.0.0 || ^18.0.0 || ^19.0.0`.
   > Updated both `react` and `react-dom` peer dependency ranges to include `^18.0.0`. React 18 is currently the dominant version in use, so this was a significant gap causing spurious npm warnings on install.
 
-- [ ] **1.4 — Fix JWT audience array support (RFC 7519 compliance)** `verifyTokenClaims` compares `payload.aud !== audience` using strict equality. RFC 7519 allows `aud` to be a string array. If Logto issues a multi-audience token, legitimate users are rejected. Update the check to handle both `string` and `string[]` for `aud`.
+- [X] **1.4 — Fix JWT audience array support (RFC 7519 compliance)** `verifyTokenClaims` compares `payload.aud !== audience` using strict equality. RFC 7519 allows `aud` to be a string array. If Logto issues a multi-audience token, legitimate users are rejected. Update the check to handle both `string` and `string[]` for `aud`.
+  > Updated the audience check in `verifyTokenClaims` to use `Array.isArray(aud) ? aud.includes(audience) : aud === audience`. Also added explicit `aud?: string | string[]` (and other standard JWT claims) to the `AuthPayload` interface in `types.ts` for proper typing.
 
 - [ ] **1.5 — Fix inconsistent issuer construction in `verifyTokenClaims`** The JWKS fetch uses string concatenation (`${normalizedLogtoUrl}/oidc/jwks`) while issuer verification uses `new URL('oidc', logtoUrl)`. These produce different results when `logtoUrl` has a path suffix. Unify both to use the same URL construction strategy.
 
