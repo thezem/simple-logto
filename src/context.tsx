@@ -91,14 +91,25 @@ const InternalAuthProvider = ({
   const errorCount = useRef<number>(0)
   /**
    * Counts consecutive transient errors (network failures, 5xx, timeouts).
-   * These should NOT sign the user out — the session may still be valid.
+   * These should NOT sign the user out — the session may likely still be valid.
    * Reset to 0 on any successful token fetch or on a confirmed auth error path.
    */
   const transientErrorCount = useRef<number>(0)
   /** Pending exponential-backoff retry timer; cleared on successful load or unmount. */
   const backoffTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>()
+  /** Set to true in the unmount cleanup; guards async callbacks against firing on dead component. */
+  const isUnmountedRef = useRef<boolean>(false)
+  /** Tracks the popup-closed polling interval so it can be cleared on provider unmount. */
+  const popupIntervalRef = useRef<ReturnType<typeof setInterval> | undefined>()
+  /** Tracks the 5-minute popup auto-cleanup timer so it can be cleared on provider unmount. */
+  const popupCleanupTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>()
   const MAX_ERROR_COUNT = 3
-  const MAX_TRANSIENT_ERRORS = 5 // More lenient — network outages shouldn't log the user out
+  /**
+   * Maximum consecutive transient errors before giving up and signing the user out.
+   * With exponential backoff (1 s, 2 s, 4 s, 8 s, 16 s) total wait ≈ 31 s before
+   * the user sees an error state and is signed out.
+   */
+  const MAX_TRANSIENT_ERRORS = 5
   const MIN_LOAD_INTERVAL = 1000 // 1 second between calls
 
   const loadUser = useCallback(
@@ -152,21 +163,10 @@ const InternalAuthProvider = ({
           const errorMessage = error instanceof Error ? error.message.toLowerCase() : ''
           const errorCode = typeof error === 'object' && error !== null && 'code' in error ? (error as { code: unknown }).code : undefined
 
-          const isTransientError =
-            // Network-level failures (no response from server)
-            (error instanceof TypeError && (errorMessage.includes('fetch') || errorMessage.includes('network'))) ||
-            // Explicit network/timeout strings that various runtimes may use
-            errorMessage.includes('networkerror') ||
-            errorMessage.includes('network error') ||
-            errorMessage.includes('timeout') ||
-            errorMessage.includes('econnrefused') ||
-            errorMessage.includes('enotfound') ||
-            // HTTP 5xx responses surfaced as errors by the Logto SDK
-            errorMessage.includes('500') ||
-            errorMessage.includes('502') ||
-            errorMessage.includes('503') ||
-            errorMessage.includes('504')
-
+          // Auth errors are evaluated FIRST because they must take priority:
+          // an error message that contains both an auth keyword ("invalid") and a
+          // network keyword ("network timeout") must be treated as an auth error to
+          // ensure the user is correctly signed out rather than silently retried.
           const isDefiniteAuthError =
             // Specific Logto / OAuth error messages
             errorMessage.includes('invalid') ||
@@ -174,6 +174,23 @@ const InternalAuthProvider = ({
             errorMessage.includes('grant request is invalid') ||
             // OAuth error code from the token endpoint
             errorCode === 'invalid_grant'
+
+          // A transient error is one that looks like a network/infrastructure failure
+          // AND is NOT also a definite auth error (the auth keyword takes precedence).
+          const isTransientError =
+            !isDefiniteAuthError && // Network-level failures (no response from server)
+            ((error instanceof TypeError && (errorMessage.includes('fetch') || errorMessage.includes('network'))) ||
+              // Explicit network/timeout strings that various runtimes may use
+              errorMessage.includes('networkerror') ||
+              errorMessage.includes('network error') ||
+              errorMessage.includes('timeout') ||
+              errorMessage.includes('econnrefused') ||
+              errorMessage.includes('enotfound') ||
+              // HTTP 5xx responses surfaced as errors by the Logto SDK
+              errorMessage.includes('500') ||
+              errorMessage.includes('502') ||
+              errorMessage.includes('503') ||
+              errorMessage.includes('504'))
 
           // ─── Transient error path ────────────────────────────────────────────
           if (isTransientError) {
@@ -190,15 +207,27 @@ const InternalAuthProvider = ({
               // Clear any previously scheduled retry before scheduling a new one
               clearTimeout(backoffTimerRef.current)
               backoffTimerRef.current = setTimeout(() => {
-                loadUserRef.current(true)
+                // Guard against the component having unmounted during the backoff window
+                if (!isUnmountedRef.current) {
+                  loadUserRef.current(true)
+                }
               }, backoffMs)
             } else {
-              // Too many transient failures in a row — give up gracefully and clear
-              // user state so the UI can show an appropriate error, but do NOT sign out.
-              console.warn('Max transient error retries exceeded. Clearing user state without signing out.')
+              // All retries exhausted — the network failure is sustained long enough that
+              // we can no longer guarantee the session is still valid. Sign the user out
+              // cleanly so the UI reaches a known, non-ambiguous state.
+              console.warn('Max transient error retries exceeded. Signing out to reset to a clean state.')
               setUser(null)
               jwtCookieUtils.removeToken()
               transientErrorCount.current = 0
+              try {
+                await logtoSignOut()
+              } catch (logoutError) {
+                console.error('Error during forced logout after transient retry exhaustion:', logoutError)
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('auth-state-changed'))
+                }
+              }
             }
           } else {
             // ─── Auth error path ─────────────────────────────────────────────────
@@ -244,10 +273,17 @@ const InternalAuthProvider = ({
     loadUser()
   }, [loadUser])
 
-  // Clean up any pending backoff retry timer when this provider unmounts
+  // Clean up all async resources when this provider unmounts
   useEffect(() => {
     return () => {
+      // Mark as unmounted so any in-flight backoff callbacks do not call loadUser
+      // on a dead component tree (guards against the timer/unmount race condition).
+      isUnmountedRef.current = true
       clearTimeout(backoffTimerRef.current)
+      // Clean up popup polling interval and 5-minute auto-cleanup timer in case
+      // the provider is unmounted while a popup sign-in is still in progress.
+      clearInterval(popupIntervalRef.current)
+      clearTimeout(popupCleanupTimerRef.current)
     }
   }, [])
 
@@ -363,21 +399,27 @@ const InternalAuthProvider = ({
           return
         }
 
-        // Declared before handleMessage so the closure can reference it once assigned
+        // Declared before handleMessage so the closure can reference it once assigned.
+        // Also tracked in a ref so the provider's unmount cleanup can clear it.
         let cleanupTimeoutId: ReturnType<typeof setTimeout> | undefined
 
-        // Listen for the popup to close or complete authentication
+        // Listen for the popup to close or complete authentication.
+        // The interval ID is stored in a ref so it survives provider unmount.
         const checkClosed = setInterval(() => {
           if (popup.closed) {
             clearInterval(checkClosed)
+            popupIntervalRef.current = undefined
             // Popup closed - delay allows Logto SDK to sync from shared localStorage
             // before we attempt to read claims with forceRefresh=true.
             setTimeout(() => {
-              loadUserRef.current(true) // forceRefresh=true to bypass rate limiting and isLoading check
-              window.dispatchEvent(new CustomEvent('auth-state-changed'))
+              if (!isUnmountedRef.current) {
+                loadUserRef.current(true) // forceRefresh=true to bypass rate limiting and isLoading check
+                window.dispatchEvent(new CustomEvent('auth-state-changed'))
+              }
             }, POPUP_AUTH_EVENT_DELAY)
           }
         }, 1000)
+        popupIntervalRef.current = checkClosed
 
         // Listen for messages from the popup
         const handleMessage = (event: MessageEvent) => {
@@ -386,14 +428,18 @@ const InternalAuthProvider = ({
           if (event.data.type === 'SIGNIN_SUCCESS' || event.data.type === 'SIGNIN_COMPLETE') {
             // Cancel the 5-minute stale cleanup and remove all listeners immediately
             clearTimeout(cleanupTimeoutId)
+            popupCleanupTimerRef.current = undefined
             window.removeEventListener('message', handleMessage)
             clearInterval(checkClosed)
+            popupIntervalRef.current = undefined
             popup.close()
             // Delay lets Logto's internal state sync from the tokens the popup wrote to
             // shared localStorage before we read claims with forceRefresh=true.
             setTimeout(() => {
-              loadUserRef.current(true) // forceRefresh=true to bypass rate limiting
-              window.dispatchEvent(new CustomEvent('auth-state-changed'))
+              if (!isUnmountedRef.current) {
+                loadUserRef.current(true) // forceRefresh=true to bypass rate limiting
+                window.dispatchEvent(new CustomEvent('auth-state-changed'))
+              }
             }, POPUP_AUTH_EVENT_DELAY)
           }
         }
@@ -406,8 +452,11 @@ const InternalAuthProvider = ({
           clearInterval(checkClosed)
         }
 
-        // Auto-cleanup after 5 minutes if popup neither completes nor closes
+        // Auto-cleanup after 5 minutes if popup neither completes nor closes.
+        // Stored in both the local variable (for the handleMessage closure) and
+        // the ref (so provider unmount can cancel it).
         cleanupTimeoutId = setTimeout(cleanupListener, 300000)
+        popupCleanupTimerRef.current = cleanupTimeoutId
       }
     },
     [enablePopupSignIn, callbackUrl, logtoSignIn],
