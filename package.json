@@ -43,7 +43,7 @@
     "lint:fix": "eslint . --fix",
     "clean": "rm -rf dist",
     "prepublishOnly": "npm run clean && npm run build",
-    "publish": "npm publish --access public",
+    "publish": "npm publish --access public --provenance",
     "prepare": "husky"
   },
   "peerDependencies": {

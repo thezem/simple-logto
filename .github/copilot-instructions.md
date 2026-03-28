@@ -33,11 +33,12 @@ This repository contains a small monolithic library for simplifying Logto authen
 The repository uses **Vitest** with `happy-dom` and `@testing-library/react`. Run the test suite with:
 
 ```bash
-npm test                          # watch mode
-npx vitest run                    # single pass (used in CI)
+npm test                             # watch mode
+npx vitest run                       # single pass (used in CI)
 npx vitest run src/useAuth.test.tsx  # run a single file
-npm run test:coverage             # with coverage report
 ```
+
+> Coverage: `npm run test:coverage` requires `@vitest/coverage-v8` (not installed by default). Run `npm install --save-dev @vitest/coverage-v8` before using it.
 
 Test setup is in `vitest.setup.ts` (imports `@testing-library/jest-dom` matchers).
 

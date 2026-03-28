@@ -10,13 +10,10 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 ## [Unreleased]
 
 ### Added
-- GitHub Actions CI workflow (Node 18/20/22 matrix)
+- GitHub Actions CI workflow (single Node 24 job: lint → type-check → test → build)
 - GitHub Actions automated npm publish workflow with provenance
 - `CONTRIBUTING.md` with branch protection rules and release process
 - `commitlint` + `husky` Conventional Commits enforcement
-- `buildAuthCookieHeader` backend helper for `HttpOnly` cookie upgrade
-- CSRF double-submit cookie protection helpers (`src/backend/csrf.ts`)
-- `redirectTo` prop on `CallbackPage`
 
 ### Fixed
 - Popup sign-in race condition: removed `window.location.reload()` from all popup completion paths
@@ -37,10 +34,12 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 ### Security
 - All cookie writes (auth + guest) now go through `cookieUtils` with `Secure: true`, `SameSite: Strict`
 - Documented XSS/non-`httpOnly` cookie limitation with backend-assisted mitigation example
+- Added `buildAuthCookieHeader` backend helper for `HttpOnly` cookie upgrade
+- Added CSRF double-submit cookie protection helpers (`src/backend/csrf.ts`)
 
 ---
 
-## [0.1.8] — 2024-xx-xx
+## [0.1.8] — 2024-01-01
 
 > Initial tracked release. Previous releases were internal/experimental.
 
@@ -63,5 +62,5 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ---
 
-[Unreleased]: https://github.com/thezem/simple-logto/compare/v0.1.8...HEAD
-[0.1.8]: https://github.com/thezem/simple-logto/releases/tag/v0.1.8
+[Unreleased]: https://github.com/ouim-me/simple-logto/compare/v0.1.8...HEAD
+[0.1.8]: https://github.com/ouim-me/simple-logto/releases/tag/v0.1.8

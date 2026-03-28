@@ -29,9 +29,10 @@ export default {
     'header-max-length': [2, 'always', 72],
     // Subject must not end with a period
     'subject-full-stop': [2, 'never', '.'],
-    // Subject case: sentence-case or lower-case (both common in JS projects)
+    // Subject case: block ALL-CAPS, PascalCase, and Title Case subjects.
+    // Severity 2 (error) — these forms are consistently avoided in this repo's history.
     'subject-case': [
-      1,
+      2,
       'never',
       ['start-case', 'pascal-case', 'upper-case'],
     ],
