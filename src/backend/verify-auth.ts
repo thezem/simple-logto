@@ -218,14 +218,96 @@ function verifyTokenClaims(payload: AuthPayload, options: VerifyAuthOptions): vo
 }
 
 /**
+ * Validate the shape of a raw JWT payload before trusting its fields.
+ *
+ * `jose`'s `jwtVerify` returns `JWTPayload` where all standard claims are optional.
+ * This function asserts that every field we rely on is present and of the correct type
+ * so that downstream code never operates on unexpected `undefined` / wrong-type values.
+ *
+ * @throws {Error} If any required or typed claim is absent or of the wrong type.
+ */
+function validatePayloadShape(payload: unknown): asserts payload is AuthPayload {
+  if (typeof payload !== 'object' || payload === null) {
+    throw new Error('JWT payload is missing or not an object')
+  }
+
+  const p = payload as Record<string, unknown>
+
+  // `sub` (subject / user ID) is required — the rest of the library depends on it.
+  if (typeof p.sub !== 'string' || p.sub.trim() === '') {
+    throw new Error('JWT payload is missing required field "sub" (user ID)')
+  }
+
+  // Type-check optional standard claims that are used in verifyTokenClaims / downstream.
+  if (p.iss !== undefined && typeof p.iss !== 'string') {
+    throw new Error('JWT payload field "iss" must be a string')
+  }
+  if (p.exp !== undefined && typeof p.exp !== 'number') {
+    throw new Error('JWT payload field "exp" must be a number')
+  }
+  if (p.nbf !== undefined && typeof p.nbf !== 'number') {
+    throw new Error('JWT payload field "nbf" must be a number')
+  }
+  if (p.aud !== undefined) {
+    const aud = p.aud
+    const isValid =
+      typeof aud === 'string' || (Array.isArray(aud) && aud.every(a => typeof a === 'string'))
+    if (!isValid) {
+      throw new Error('JWT payload field "aud" must be a string or string[]')
+    }
+  }
+}
+
+/**
+ * Verify a token against a specific set of JWKS keys.
+ *
+ * Separated from `verifyLogtoToken` so that the outer function can call this helper
+ * twice when JWKS cache invalidation + retry is needed (key rotation scenario).
+ *
+ * @throws {Error} On key-lookup failure, signature verification failure, or claims mismatch.
+ */
+async function verifyWithKeys(
+  token: string,
+  header: Record<string, unknown>,
+  keys: JwkKey[],
+  options: VerifyAuthOptions,
+): Promise<AuthContext> {
+  const kid = typeof header.kid === 'string' ? header.kid : undefined
+  const alg = typeof header.alg === 'string' ? header.alg : undefined
+
+  const jwk = findMatchingKey(keys, kid, alg)
+  const publicKey = await importJWK(jwk, alg || 'RS256')
+  const { payload: rawPayload } = await jwtVerify(token, publicKey)
+
+  // Validate payload shape before trusting any field (task 3.5)
+  validatePayloadShape(rawPayload)
+
+  // Validate all business claims (issuer, audience, expiry, scope)
+  verifyTokenClaims(rawPayload, options)
+
+  return {
+    userId: rawPayload.sub,
+    isAuthenticated: true,
+    payload: rawPayload,
+    isGuest: false,
+  }
+}
+
+/**
  * Verify JWT Token from Logto
  *
  * Verifies a Logto JWT token by:
  * 1. Decoding the JWT header to extract key ID (kid) and algorithm
- * 2. Fetching the JWKS (JSON Web Key Set) from Logto's OIDC endpoint
+ * 2. Fetching the JWKS (JSON Web Key Set) from Logto's OIDC endpoint (cached, 5 min TTL)
  * 3. Finding the matching public key
  * 4. Verifying the token signature
- * 5. Validating all claims (issuer, audience, expiration, scope, etc.)
+ * 5. Validating the payload shape (all required/typed fields present)
+ * 6. Validating all claims (issuer, audience, expiration, scope, etc.)
+ *
+ * Key-rotation resilience: if step 3 or 4 fails with a key-related error (e.g. Logto
+ * rotated its signing keys and the cached JWKS no longer contains the new `kid`), the
+ * cache entry is invalidated and a single retry is attempted with freshly fetched JWKS.
+ * Claims errors (wrong audience, expired token, etc.) are NOT retried.
  *
  * @param {string} token - The JWT token to verify (typically from Authorization header or cookie)
  * @param {VerifyAuthOptions} options - Verification options
@@ -252,6 +334,8 @@ function verifyTokenClaims(payload: AuthPayload, options: VerifyAuthOptions): vo
  */
 export async function verifyLogtoToken(token: string, options: VerifyAuthOptions): Promise<AuthContext> {
   const { logtoUrl } = options
+  const normalizedLogtoUrl = logtoUrl.replace(/\/+$/, '')
+  const jwksUrl = `${normalizedLogtoUrl}/oidc/jwks`
 
   try {
     // Decode JWT header to get kid and alg
@@ -261,28 +345,35 @@ export async function verifyLogtoToken(token: string, options: VerifyAuthOptions
     }
 
     const headerJson = base64UrlDecode(headerBase64)
-    const header = JSON.parse(headerJson)
+    const header = JSON.parse(headerJson) as Record<string, unknown>
 
-    // Fetch JWKS from Logto
+    // Fetch JWKS from Logto (uses in-memory cache when within 5-minute TTL)
     const keys = await fetchJWKS(logtoUrl)
 
-    // Find matching key
-    const jwk = findMatchingKey(keys, header.kid, header.alg)
+    try {
+      return await verifyWithKeys(token, header, keys, options)
+    } catch (verifyError) {
+      // Determine whether this is a key-lookup / signature failure.
+      // These errors can occur when Logto has rotated its signing keys and our
+      // cached JWKS no longer contains the current key. Claims errors (audience
+      // mismatch, expired token, etc.) must NOT be retried.
+      const errMsg = verifyError instanceof Error ? verifyError.message.toLowerCase() : ''
+      const isKeyRelatedError =
+        errMsg.includes('key') ||
+        errMsg.includes('signature') ||
+        errMsg.includes('not found in jwks') ||
+        errMsg.includes('no keys found')
 
-    // Import the JWK for verification
-    const publicKey = await importJWK(jwk, header?.alg || 'RS256')
+      if (!isKeyRelatedError) {
+        // Not a key problem — propagate as-is; the outer catch will wrap it.
+        throw verifyError
+      }
 
-    // Verify the JWT signature and get payload
-    const { payload } = (await jwtVerify(token, publicKey)) as { payload: AuthPayload }
-
-    // Manually verify all claims
-    verifyTokenClaims(payload, options)
-
-    return {
-      userId: payload.sub,
-      isAuthenticated: true,
-      payload,
-      isGuest: false,
+      // Invalidate the stale cache entry and fetch a fresh JWKS, then retry once.
+      console.warn('[verifyLogtoToken] Key/signature error — invalidating JWKS cache and retrying with fresh keys')
+      jwksCache.delete(jwksUrl)
+      const freshKeys = await fetchJWKS(logtoUrl)
+      return await verifyWithKeys(token, header, freshKeys, options)
     }
   } catch (error) {
     throw new Error(`Token verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
