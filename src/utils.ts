@@ -387,16 +387,26 @@ export const guestUtils = {
       return result.visitorId
     } catch (error) {
       console.warn('Failed to generate fingerprint, falling back to UUID:', error)
-      // Fallback to UUID generation
-      if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+      // crypto.randomUUID() — available in all modern browsers (Chrome 92+, Safari 15.4+,
+      // Firefox 95+) and Node 19+ as a global.
+      if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
         return crypto.randomUUID()
       }
-      // Fallback UUID generation for older browsers
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        const r = (Math.random() * 16) | 0
-        const v = c === 'x' ? r : (r & 0x3) | 0x8
-        return v.toString(16)
-      })
+      // crypto.getRandomValues fallback — available since IE11 and all modern browsers.
+      // Avoids Math.random() which is not cryptographically secure.
+      if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+        const bytes = new Uint8Array(16)
+        crypto.getRandomValues(bytes)
+        // Set version 4 and variant bits per RFC 4122
+        bytes[6] = (bytes[6] & 0x0f) | 0x40
+        bytes[8] = (bytes[8] & 0x3f) | 0x80
+        return Array.from(bytes)
+          .map((b, i) => ([4, 6, 8, 10].includes(i) ? '-' : '') + b.toString(16).padStart(2, '0'))
+          .join('')
+      }
+      // No crypto API available — this path is unreachable in any browser built in
+      // the last decade, but included to satisfy TypeScript's exhaustiveness check.
+      throw new Error('No cryptographically secure random source available for guest ID generation')
     }
   },
 

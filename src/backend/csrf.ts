@@ -42,9 +42,11 @@
  * LIMITATIONS / NOTES:
  *   - CSRF protection is complementary to, not a replacement for, a strict
  *     Content-Security-Policy and XSS hardening.
- *   - `SameSite=Strict` on the *auth* cookie already prevents many CSRF
- *     vectors on modern browsers.  The helpers here are defence-in-depth for
- *     older browsers and unconventional request flows.
+ *   - `SameSite=Strict` on the *auth* cookie provides strong CSRF protection
+ *     on its own for modern browsers: the browser withholds the cookie on all
+ *     cross-site requests, including cross-site form POSTs. The double-submit
+ *     pattern here is defence-in-depth for older browsers and programmatic
+ *     enforcement when you want to verify CSRF explicitly in middleware logic.
  *   - The CSRF cookie is intentionally **not** `HttpOnly` — the client JS
  *     must be able to read it.  Do not store anything sensitive in it.
  *   - Safe HTTP methods (GET, HEAD, OPTIONS, TRACE) are exempt from CSRF
@@ -79,9 +81,10 @@
  *     ?.split('=')[1] ?? '';
  * }
  *
+ * // HTTP headers are case-insensitive; use lowercase to match CSRF_HEADER_NAME
  * await fetch('/api/data', {
  *   method: 'POST',
- *   headers: { 'X-CSRF-Token': getCsrfToken(), 'Content-Type': 'application/json' },
+ *   headers: { 'x-csrf-token': getCsrfToken(), 'Content-Type': 'application/json' },
  *   body: JSON.stringify({ ... }),
  * });
  * ```
@@ -114,6 +117,7 @@
  * ```
  */
 
+import { randomUUID } from 'node:crypto'
 import type { ExpressRequest, ExpressResponse, ExpressNext, NextRequest } from './types'
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -139,21 +143,12 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
 /**
  * Generate a cryptographically random CSRF token string.
  *
- * Uses `globalThis.crypto.randomUUID()` (Web Crypto API, available natively
- * in Node 19+ and as a global in Node 16–18 via the `--experimental-global-webcrypto`
- * flag or the `node:crypto` module).  Falls back to `require('node:crypto')` for
- * older Node environments.
- *
- * The raw UUID provides 122 bits of entropy — sufficient for CSRF tokens.
+ * Uses `randomUUID` from `node:crypto` (available since Node.js 14.17,
+ * works in both CJS and ESM builds). Provides 122 bits of entropy —
+ * sufficient for CSRF tokens.
  */
 export function generateCsrfToken(): string {
-  // Web Crypto API (Node 19+, modern browsers, Edge Runtime)
-  if (typeof globalThis.crypto?.randomUUID === 'function') {
-    return globalThis.crypto.randomUUID()
-  }
-  // Node.js built-in crypto (Node 14.17+ — available in all supported LTS)
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  return (require('node:crypto') as { randomUUID: () => string }).randomUUID()
+  return randomUUID()
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -197,7 +192,14 @@ export function buildCsrfCookieHeader(
     sameSite = 'Strict',
   } = options
 
-  // Cookie values for CSRF tokens are UUIDs — no special chars, no encoding needed.
+  // Guard against header injection: CSRF tokens from generateCsrfToken() are
+  // UUIDs and contain only hex digits and hyphens, but buildCsrfCookieHeader is
+  // a public export that accepts arbitrary strings. Reject any value containing
+  // characters that could break or inject additional Set-Cookie directives.
+  if (/[\r\n;]/.test(token)) {
+    throw new Error('CSRF token contains invalid characters (newline or semicolon)')
+  }
+
   let header = `${cookieName}=${token}; Max-Age=${maxAge}; Path=${path}; Secure; SameSite=${sameSite}`
   if (domain) header += `; Domain=${domain}`
   return header
@@ -221,12 +223,6 @@ export interface CsrfMiddlewareOptions {
   sameSite?: 'Strict' | 'Lax'
   /** Cookie lifetime in seconds. Default: `86400` (1 day). */
   maxAge?: number
-}
-
-// Narrowly extend ExpressResponse to include only what we need here.
-// Real Express responses implement all of these; our minimal test type may not.
-type CsrfExpressResponse = ExpressResponse & {
-  setHeader?: (name: string, value: string) => void
 }
 
 /**
@@ -262,7 +258,6 @@ export function createCsrfMiddleware(options: CsrfMiddlewareOptions = {}) {
   } = options
 
   return (req: ExpressRequest, res: ExpressResponse, next: ExpressNext): void => {
-    const csrfRes = res as CsrfExpressResponse
     // req is Express Request at runtime — it has `.method`
     const method = ((req as unknown as { method?: string }).method ?? 'GET').toUpperCase()
 
@@ -271,8 +266,8 @@ export function createCsrfMiddleware(options: CsrfMiddlewareOptions = {}) {
       if (!req.cookies?.[cookieName]) {
         const token = generateCsrfToken()
         const cookieHeader = buildCsrfCookieHeader(token, { cookieName, maxAge, domain, path, sameSite })
-        if (typeof csrfRes.setHeader === 'function') {
-          csrfRes.setHeader('Set-Cookie', cookieHeader)
+        if (typeof res.setHeader === 'function') {
+          res.setHeader('Set-Cookie', cookieHeader)
         }
       }
       return next()
@@ -284,14 +279,10 @@ export function createCsrfMiddleware(options: CsrfMiddlewareOptions = {}) {
     const headerTokenStr = Array.isArray(headerToken) ? headerToken[0] : headerToken
 
     if (!cookieToken || !headerTokenStr || cookieToken !== headerTokenStr) {
-      res
-        .status(403)
-        .json({
-          error: 'CSRF validation failed',
-          message:
-            `Include the '${headerName}' request header with the value ` +
-            `from the '${cookieName}' cookie.`,
-        })
+      res.status(403).json({
+        error: 'CSRF validation failed',
+        message: `Include the '${headerName}' request header with the value ` + `from the '${cookieName}' cookie.`,
+      })
       return
     }
 
@@ -339,10 +330,7 @@ export interface CsrfVerifyResult {
  *   // proceed with request handling
  * }
  */
-export function verifyCsrfToken(
-  request: NextRequest,
-  options: { cookieName?: string; headerName?: string } = {},
-): CsrfVerifyResult {
+export function verifyCsrfToken(request: NextRequest, options: { cookieName?: string; headerName?: string } = {}): CsrfVerifyResult {
   const { cookieName = CSRF_COOKIE_NAME, headerName = CSRF_HEADER_NAME } = options
 
   const cookieToken = request.cookies.get(cookieName)?.value
@@ -362,6 +350,11 @@ export function verifyCsrfToken(
     }
   }
 
+  // NOTE: This comparison is not timing-safe (not using timingSafeEqual).
+  // For the double-submit cookie pattern, timing attacks are not a practical
+  // concern: an attacker cannot observe server response times on cross-origin
+  // requests (blocked by the browser's same-origin policy), and brute-forcing
+  // a 122-bit UUID is computationally infeasible regardless of timing leakage.
   if (cookieToken !== headerToken) {
     return {
       valid: false,
