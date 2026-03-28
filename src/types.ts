@@ -46,6 +46,8 @@ export interface CallbackPageProps {
   successComponent?: React.ReactNode
   onSuccess?: () => void
   onError?: (error: Error) => void
+  /** URL to redirect to after successful authentication. Defaults to `'/'`. */
+  redirectTo?: string
 }
 
 export interface AdditionalPage {

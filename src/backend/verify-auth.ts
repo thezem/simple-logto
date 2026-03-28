@@ -444,10 +444,13 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
  * @param {boolean} [options.allowGuest] - Allow unauthenticated guest access
  *
  * @returns {Promise<{success: true, auth: AuthContext} | {success: false, error: string, auth?: AuthContext}>}
- * Object containing success flag, auth context, and error message if verification fails
+ * - `success: true` — token verified **or** a valid guest session (`allowGuest: true`).
+ *   Always check `result.auth.isAuthenticated` (or `result.auth.isGuest`) to distinguish
+ *   authenticated users from guests; do NOT rely on `success` alone as an auth gate.
+ * - `success: false` — no token found and guest mode is disabled, or an unrecoverable error.
  *
  * @example
- * // In a Next.js API route
+ * // In a Next.js API route — reject unauthenticated requests
  * import { verifyNextAuth } from '@ouim/simple-logto/backend';
  *
  * export async function GET(request) {
@@ -467,7 +470,7 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
  * }
  *
  * @example
- * // In Next.js middleware
+ * // In Next.js middleware — allow guests, block fully unauthenticated requests
  * import { NextRequest, NextResponse } from 'next/server';
  * import { verifyNextAuth } from '@ouim/simple-logto/backend';
  *
@@ -477,8 +480,13 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
  *     allowGuest: true
  *   });
  *
+ *   // success:true covers both authenticated users and guests when allowGuest is set.
+ *   // Use auth.isAuthenticated (or auth.isGuest) to distinguish the two cases.
  *   if (result.success && result.auth.isAuthenticated) {
  *     return NextResponse.next();
+ *   }
+ *   if (result.success && result.auth.isGuest) {
+ *     return NextResponse.next(); // allow guest through, or redirect to limited view
  *   }
  *
  *   return NextResponse.redirect(new URL('/login', request.url));
@@ -509,9 +517,10 @@ export async function verifyNextAuth(
           guestId: guestId || undefined,
         }
 
+        // A valid guest session is a success — callers should use `auth.isGuest` to
+        // distinguish guests from authenticated users rather than checking `success`.
         return {
-          success: false,
-          error: 'No authentication token found',
+          success: true,
           auth: guestAuth,
         }
       }
@@ -529,9 +538,15 @@ export async function verifyNextAuth(
       auth: authContext,
     }
   } catch (error) {
-    // If allowGuest is enabled and token verification fails, fall back to guest
+    // If allowGuest is enabled and token verification fails, fall back to guest.
+    // A degraded guest session is still a valid session — callers use `auth.isGuest`
+    // to distinguish guests from authenticated users.
     if (options.allowGuest) {
       const guestId = extractGuestTokenFromCookies(request.cookies)
+      const verificationError = error instanceof Error ? error.message : 'Unknown error'
+
+      // Log so the failure isn't completely silent during debugging
+      console.warn(`[verifyNextAuth] Token verification failed, falling back to guest: ${verificationError}`)
 
       const guestAuth: AuthContext = {
         userId: null,
@@ -542,8 +557,7 @@ export async function verifyNextAuth(
       }
 
       return {
-        success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        success: true,
         auth: guestAuth,
       }
     }
