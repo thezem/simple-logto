@@ -59,7 +59,7 @@ export const getBundlerConfig = (bundler: 'vite' | 'webpack' | 'nextjs' = 'vite'
     case 'vite':
       return {
         optimizeDeps: {
-          include: ['@logto/react', '@ouim/simple-logto'],
+          include: ['@logto/react'],
         },
         resolve: {
           alias: joseAlias,

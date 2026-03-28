@@ -40,17 +40,17 @@ const CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
 /**
  * Extract guest token from cookie
  */
-function extractGuestTokenFromCookies(cookies: unknown, cookieName: string = 'guest_logto_authtoken'): string | null {
+function extractGuestTokenFromCookies(cookies: unknown, cookieName: string = 'guest_logto_authtoken'): string | undefined {
   if (isNextCookieStore(cookies)) {
     // Next.js cookies
     const cookie = cookies.get(cookieName)
-    return cookie?.value ?? null
+    return cookie?.value ?? undefined
   } else if (isExpressCookieStore(cookies)) {
     // Express cookies
-    return cookies[cookieName] ?? null
+    return cookies[cookieName] ?? undefined
   }
-  // No recognisable cookie store — caller decides what to do with null
-  return null
+  // No recognisable cookie store — guest identity is unknown
+  return undefined
 }
 
 /**
@@ -374,7 +374,7 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
             isAuthenticated: false,
             payload: null,
             isGuest: true,
-            guestId: guestId || undefined,
+            guestId,
           }
 
           return next()

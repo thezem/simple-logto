@@ -19,7 +19,7 @@ export interface AuthContext {
 
 export interface VerifyAuthOptions {
   logtoUrl: string
-  audience: string
+  audience?: string // optional — many callers (e.g. allowGuest flows) don't target a specific API resource
   cookieName?: string
   requiredScope?: string
   allowGuest?: boolean
