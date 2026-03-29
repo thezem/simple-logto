@@ -163,6 +163,30 @@ The verification helpers will look for the JWT token in the following order:
 - `jwksCacheTtlMs`: Override the per-process JWKS cache TTL in milliseconds (optional, defaults to 5 minutes)
 - `skipJwksCache`: Force a fresh JWKS fetch for this verification call instead of reading/writing the in-memory cache (optional)
 
+## Multi-scope Authorization Helpers
+
+`requiredScope` is intentionally narrow. When you need more than one scope, verify the token first and then use the exported helpers:
+
+```ts
+import { hasScopes, requireScopes, verifyAuth } from '@ouim/simple-logto/backend'
+
+const auth = await verifyAuth(request, {
+  logtoUrl: 'https://your-logto-domain.com',
+  audience: 'your-api-resource-identifier',
+})
+
+if (!hasScopes(auth, ['read:reports', 'write:reports'], { mode: 'any' })) {
+  throw new Error('Forbidden')
+}
+
+requireScopes(auth, ['read:reports', 'write:reports'])
+```
+
+- `hasScopes(subject, scopes, { mode })` returns `true` / `false`
+- `requireScopes(subject, scopes, { mode })` throws a descriptive authorization error
+- `mode` defaults to `'all'`; set `'any'` to accept any matching scope
+- Both helpers accept either a raw `AuthPayload` or a full `AuthContext`
+
 ## JWKS Cache Controls
 
 The backend verifier keeps a per-process in-memory JWKS cache by default. That is usually the right tradeoff, but you can now control it explicitly when needed:

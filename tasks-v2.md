@@ -343,9 +343,11 @@
 
 **Priority: 🟢 Low**
 
-- [ ] **10.1 — Add multi-scope authorization helpers** The current API only supports a single `requiredScope`.
+- [x] **10.1 — Add multi-scope authorization helpers** The current API only supports a single `requiredScope`.
 
   > Provide helpers such as `requireScopes(scopes, { mode: 'all' | 'any' })` without coupling them too tightly to Express or Next-specific middleware.
+  >
+  > Added framework-agnostic backend helpers in `src/backend/authorization.ts`: `hasScopes(subject, scopes, { mode })` for boolean checks and `requireScopes(subject, scopes, { mode })` for assertion-style guards. Both accept either a raw `AuthPayload` or a full `AuthContext`, normalize OAuth-style whitespace-delimited scope strings, and support `'all'` / `'any'` matching without changing existing middleware behavior. Exported them from the backend entrypoint, added focused unit coverage in `src/backend/authorization.test.ts`, and documented the pattern in both README surfaces.
 
 - [ ] **10.2 — Add role-based access control (RBAC) helpers** Roles are a common follow-on need once token verification is stable.
 
