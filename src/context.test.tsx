@@ -647,6 +647,27 @@ describe('AuthProvider Lifecycle Callbacks', () => {
     })
     expect(logtoSignOut).not.toHaveBeenCalled()
   })
+
+  it('swallows errors thrown by consumer lifecycle callbacks without breaking sign-out', async () => {
+    const onSignOut = vi.fn(() => {
+      throw new Error('consumer callback failure')
+    })
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
+
+    render(
+      <AuthProvider config={mockConfig} onSignOut={onSignOut}>
+        <AuthControls />
+      </AuthProvider>,
+    )
+
+    await waitFor(() => expect(screen.getByText('Sign Out')).toBeInTheDocument())
+    expect(() => fireEvent.click(screen.getByText('Sign Out'))).not.toThrow()
+
+    await waitFor(() => expect(onSignOut).toHaveBeenCalledTimes(1))
+    expect(errorSpy).toHaveBeenCalledWith('Error in AuthProvider onSignOut callback:', expect.any(Error))
+
+    errorSpy.mockRestore()
+  })
 })
 
 // ---------------------------------------------------------------------------
