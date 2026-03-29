@@ -189,7 +189,8 @@
 - [x] **6.2 — Add `redirectTo` prop to `CallbackPage`** As noted in Phase 2.4, the callback redirect is hard-coded to `/`. Expose a `redirectTo` prop (and respect `onSuccess` return values) for flexibility.
   > Already completed as part of task 2.4. `CallbackPage` now accepts `redirectTo?: string` (defaulting to `'/'`) and uses it in the redirect line. The `onSuccess` callback is `() => void` by design — returning a value from it to override the redirect destination would be a breaking signature change. The prop-based `redirectTo` covers the same flexibility requirement with a cleaner API.
 
-- [ ] **6.3 — Add customization props to `SignInPage`** `SignInPage` has no props for loading state, error display, or layout. Add at minimum: `loadingComponent`, `errorComponent`, and `className` props.
+- [x] **6.3 — Add customization props to `SignInPage`** `SignInPage` has no props for loading state, error display, or layout. Add at minimum: `loadingComponent`, `errorComponent`, and `className` props.
+  > Added a new public `SignInPageProps` type and wired `SignInPage` to accept `loadingComponent`, `errorComponent`, and `className`. The component now tracks sign-in bootstrap failures with local state instead of fire-and-forget `signIn(undefined, false)`, rendering either a caller-supplied error UI or a default `<div role="alert">` message. Added `src/signin.test.tsx` covering custom loading UI, default error UI, and functional custom error rendering.
 
 - [ ] **6.4 — Fix module-level `customNavigateFunction` singleton** `utils.ts` stores the navigation function as a module-level variable. In micro-frontend or multi-instance test environments, mounting a second `AuthProvider` overwrites it for all instances. Move this to React context so each `AuthProvider` has its own navigation scope.
 
