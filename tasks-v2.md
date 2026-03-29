@@ -283,9 +283,11 @@
 
   > Replace shell-specific commands such as `rm -rf dist` with a cross-platform tool like `rimraf`, then verify the documented commands in `AGENTS.md` / `CONTRIBUTING.md` still work on Windows and on CI Linux.
 
-- [ ] **8.5 — Add explicit runtime support policy** Production libraries should clearly define supported environments and enforce them where reasonable.
+- [x] **8.5 — Add explicit runtime support policy** Production libraries should clearly define supported environments and enforce them where reasonable.
 
   > Add an `engines` field to `package.json`, document supported Node/React/`@logto/react` ranges in the README, and align CI with the declared support matrix instead of leaving compatibility implicit.
+  >
+  > Added `engines.node` to `package.json` with an explicit supported Node policy (`^18.18.0 || ^20.0.0 || ^22.0.0`), documented the supported Node/React/`@logto/react` ranges in a new `README.md` runtime-support section, and changed GitHub Actions to verify the package on Node 18/20/22. The publish workflow now runs on Node 22 so release automation also stays within the declared support matrix.
 
 - [ ] **8.6 — Add package-content / export audit checks** Public package structure should be validated automatically.
 
