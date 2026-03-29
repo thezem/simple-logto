@@ -342,6 +342,25 @@ const auth = await verifyAuth('your-jwt-token', {
 - `cookieName?`: defaults to `logto_authtoken`
 - `requiredScope?`: rejects requests missing the given scope
 - `allowGuest?`: enables guest auth fallback
+- `jwksCacheTtlMs?`: overrides the default 5 minute in-memory JWKS cache TTL
+- `skipJwksCache?`: bypasses the in-memory JWKS cache for a single verifier/middleware instance
+
+### JWKS cache controls
+
+Backend verification uses a per-process in-memory JWKS cache by default. If you need tighter control during key rotation, debugging, or unusual network setups, you can tune or clear it explicitly:
+
+```ts
+import { clearJwksCache, invalidateJwksCache, verifyAuth } from '@ouim/simple-logto/backend'
+
+await verifyAuth(token, {
+  logtoUrl: 'https://your-tenant.logto.app',
+  audience: 'https://your-api.example.com',
+  jwksCacheTtlMs: 60_000,
+})
+
+invalidateJwksCache('https://your-tenant.logto.app')
+clearJwksCache()
+```
 
 ### Auth context shape
 
