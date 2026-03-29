@@ -1,7 +1,8 @@
 'use client'
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { LogtoConfig, LogtoProvider, useLogto } from '@logto/react'
-import { transformUser, setCustomNavigate, jwtCookieUtils, guestUtils, validateLogtoConfig } from './utils'
+import { transformUser, jwtCookieUtils, guestUtils, validateLogtoConfig } from './utils'
+import { NavigationProvider } from './navigation'
 import type { AuthContextType, AuthProviderProps, LogtoUser } from './types'
 
 const POPUP_AUTH_EVENT_DELAY = 500
@@ -591,20 +592,14 @@ export const AuthProvider = ({ children, config, callbackUrl, customNavigate, en
     validateLogtoConfig(config, { warnOnMissingResources: false })
   }, [config])
 
-  // Set the custom navigate function for the entire library
-  useEffect(() => {
-    setCustomNavigate(customNavigate || null)
-
-    // Cleanup on unmount
-    return () => setCustomNavigate(null)
-  }, [customNavigate])
-
   return (
     <ClientOnly>
       <LogtoProvider config={config}>
-        <InternalAuthProvider logtoConfig={config} callbackUrl={callbackUrl} enablePopupSignIn={enablePopupSignIn}>
-          {children}
-        </InternalAuthProvider>
+        <NavigationProvider customNavigate={customNavigate}>
+          <InternalAuthProvider logtoConfig={config} callbackUrl={callbackUrl} enablePopupSignIn={enablePopupSignIn}>
+            {children}
+          </InternalAuthProvider>
+        </NavigationProvider>
       </LogtoProvider>
     </ClientOnly>
   )

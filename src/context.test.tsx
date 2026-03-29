@@ -3,6 +3,8 @@ import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { AuthProvider } from './context'
 import { useAuthContext } from './context'
+import { useAuth } from './useAuth'
+import { useNavigation } from './navigation'
 import type { LogtoConfig } from '@logto/react'
 
 // Mock @logto/react
@@ -29,7 +31,6 @@ vi.mock('./utils', () => ({
     name: claims.name,
     email: claims.email,
   }),
-  setCustomNavigate: vi.fn(),
   jwtCookieUtils: {
     saveToken: vi.fn(),
     removeToken: vi.fn(),
@@ -134,16 +135,24 @@ describe('AuthProvider Context', () => {
 
   it('should apply custom navigation if provided', async () => {
     const customNavigate = vi.fn()
+    const TestComponent = () => {
+      const navigate = useNavigation()
+
+      return <button onClick={() => navigate('/settings')}>Navigate</button>
+    }
 
     render(
       <AuthProvider config={mockConfig} customNavigate={customNavigate}>
-        <div>Test</div>
+        <TestComponent />
       </AuthProvider>,
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Test')).toBeInTheDocument()
+      expect(screen.getByText('Navigate')).toBeInTheDocument()
     })
+
+    fireEvent.click(screen.getByText('Navigate'))
+    expect(customNavigate).toHaveBeenCalledWith('/settings', undefined)
   })
 
   it('should return context data with correct initial state', async () => {
@@ -179,6 +188,66 @@ describe('AuthProvider Context', () => {
     await waitFor(() => {
       expect(screen.getByText('Test')).toBeInTheDocument()
     })
+  })
+
+  it('should scope navigation to the nearest AuthProvider', async () => {
+    const outerNavigate = vi.fn()
+    const innerNavigate = vi.fn()
+
+    const NavigationButton = ({ label }: { label: string }) => {
+      const navigate = useNavigation()
+
+      return <button onClick={() => navigate(`/${label.toLowerCase()}`)}>{label}</button>
+    }
+
+    render(
+      <AuthProvider config={mockConfig} customNavigate={outerNavigate}>
+        <NavigationButton label="Outer" />
+        <AuthProvider config={mockConfig} customNavigate={innerNavigate}>
+          <NavigationButton label="Inner" />
+        </AuthProvider>
+      </AuthProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Outer')).toBeInTheDocument()
+      expect(screen.getByText('Inner')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByText('Outer'))
+    fireEvent.click(screen.getByText('Inner'))
+
+    expect(outerNavigate).toHaveBeenCalledWith('/outer', undefined)
+    expect(innerNavigate).toHaveBeenCalledWith('/inner', undefined)
+    expect(outerNavigate).toHaveBeenCalledTimes(1)
+    expect(innerNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  it('should keep auth middleware redirects stable when customNavigate is passed inline', async () => {
+    const navigateSpy = vi.fn()
+
+    const ProtectedRoute = () => {
+      useAuth({ middleware: 'auth', redirectTo: '/signin' })
+
+      return <div>Protected</div>
+    }
+
+    const TestShell = ({ renderKey }: { renderKey: number }) => (
+      <AuthProvider config={mockConfig} customNavigate={(url, options) => navigateSpy(url, options, renderKey)}>
+        <ProtectedRoute />
+      </AuthProvider>
+    )
+
+    const { rerender } = render(<TestShell renderKey={1} />)
+
+    await waitFor(() => {
+      expect(navigateSpy).toHaveBeenCalledTimes(1)
+    })
+
+    rerender(<TestShell renderKey={2} />)
+
+    expect(navigateSpy).toHaveBeenCalledTimes(1)
+    expect(navigateSpy).toHaveBeenCalledWith('/signin', undefined, 1)
   })
 })
 

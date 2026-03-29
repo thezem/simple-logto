@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useMemo } from 'react'
 import { useAuthContext } from './context'
-import { navigateTo } from './utils'
+import { useNavigation } from './navigation'
 import type { AuthOptions, AuthContextType } from './types'
 
 /**
@@ -60,6 +60,7 @@ import type { AuthOptions, AuthContextType } from './types'
 export const useAuth = (options?: AuthOptions): AuthContextType => {
   const auth = useAuthContext()
   const { user, isLoadingUser } = auth
+  const navigateTo = useNavigation()
 
   // Memoize the options to prevent infinite re-renders when options object reference changes
   const memoizedOptions = useMemo(
@@ -84,7 +85,7 @@ export const useAuth = (options?: AuthOptions): AuthContextType => {
       // User is authenticated but the route is for guests only
       navigateTo(redirectIfAuthenticated, navigationOptions)
     }
-  }, [user, isLoadingUser, memoizedOptions])
+  }, [user, isLoadingUser, memoizedOptions, navigateTo])
 
   return auth
 }

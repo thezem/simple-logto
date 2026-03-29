@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { useAuth } from './useAuth'
 import { useAuthContext } from './context'
 
+const mockNavigate = vi.fn()
+
 // Mock useAuthContext
 vi.mock('./context', async () => {
   const actual = await vi.importActual('./context')
@@ -12,21 +14,8 @@ vi.mock('./context', async () => {
   }
 })
 
-// Mock navigateTo utility
-vi.mock('./utils', () => ({
-  navigateTo: vi.fn(),
-  transformUser: vi.fn(),
-  setCustomNavigate: vi.fn(),
-  jwtCookieUtils: {
-    saveToken: vi.fn(),
-    removeToken: vi.fn(),
-    getToken: vi.fn(),
-  },
-  guestUtils: {
-    ensureGuestId: vi.fn(),
-  },
-  validateLogtoConfig: vi.fn(),
-  cookieUtils: {},
+vi.mock('./navigation', () => ({
+  useNavigation: () => mockNavigate,
 }))
 
 describe('useAuth Hook', () => {
@@ -59,7 +48,6 @@ describe('useAuth Hook', () => {
     })
 
     it('should not redirect when middleware is undefined', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: null,
         isLoadingUser: false,
@@ -78,14 +66,13 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).not.toHaveBeenCalled()
+        expect(mockNavigate).not.toHaveBeenCalled()
       })
     })
   })
 
   describe('Auth middleware (require authentication)', () => {
     it('should redirect to /signin when user not authenticated and middleware=auth (no redirectTo)', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: null,
         isLoadingUser: false,
@@ -105,12 +92,11 @@ describe('useAuth Hook', () => {
 
       await waitFor(() => {
         // Default fallback is '/signin' (not '/404') so unauthenticated users land at the sign-in page
-        expect(navigateTo).toHaveBeenCalledWith('/signin', undefined)
+        expect(mockNavigate).toHaveBeenCalledWith('/signin', undefined)
       })
     })
 
     it('should redirect to custom URL when user not authenticated', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: null,
         isLoadingUser: false,
@@ -129,12 +115,11 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).toHaveBeenCalledWith('/login', undefined)
+        expect(mockNavigate).toHaveBeenCalledWith('/login', undefined)
       })
     })
 
     it('should not redirect when user is authenticated', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: { id: 'user-123', name: 'Test User' },
         isLoadingUser: false,
@@ -154,12 +139,11 @@ describe('useAuth Hook', () => {
 
       await waitFor(() => {
         expect(screen.getByText(/User: Test User/)).toBeInTheDocument()
-        expect(navigateTo).not.toHaveBeenCalled()
+        expect(mockNavigate).not.toHaveBeenCalled()
       })
     })
 
     it('should not redirect when still loading', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: null,
         isLoadingUser: true,
@@ -178,14 +162,13 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).not.toHaveBeenCalled()
+        expect(mockNavigate).not.toHaveBeenCalled()
       })
     })
   })
 
   describe('Guest middleware (require guest/no auth)', () => {
     it('should redirect when user is authenticated and middleware=guest', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: { id: 'user-123', name: 'Test User' },
         isLoadingUser: false,
@@ -207,12 +190,11 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).toHaveBeenCalledWith('/dashboard', undefined)
+        expect(mockNavigate).toHaveBeenCalledWith('/dashboard', undefined)
       })
     })
 
     it('should not redirect when user is not authenticated and middleware=guest', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: null,
         isLoadingUser: false,
@@ -231,13 +213,12 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).not.toHaveBeenCalled()
+        expect(mockNavigate).not.toHaveBeenCalled()
         expect(screen.getByText(/Login Page/)).toBeInTheDocument()
       })
     })
 
     it('should not redirect guest users without redirectIfAuthenticated option', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: { id: 'user-123', name: 'Test User' },
         isLoadingUser: false,
@@ -256,14 +237,13 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).not.toHaveBeenCalled()
+        expect(mockNavigate).not.toHaveBeenCalled()
       })
     })
   })
 
   describe('Navigation options', () => {
     it('should pass navigation options to navigateTo', async () => {
-      const { navigateTo } = await import('./utils')
       const mockAuth = {
         user: null,
         isLoadingUser: false,
@@ -288,14 +268,13 @@ describe('useAuth Hook', () => {
       render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).toHaveBeenCalledWith('/login', navOptions)
+        expect(mockNavigate).toHaveBeenCalledWith('/login', navOptions)
       })
     })
   })
 
   describe('Options memoization', () => {
     it('should memoize options to prevent unnecessary redirects', async () => {
-      const { navigateTo } = await import('./utils')
       let renderCount = 0
       const mockAuth = {
         user: null,
@@ -319,14 +298,14 @@ describe('useAuth Hook', () => {
       const { rerender } = render(<TestComponent />)
 
       await waitFor(() => {
-        expect(navigateTo).toHaveBeenCalledTimes(1)
+        expect(mockNavigate).toHaveBeenCalledTimes(1)
       })
 
       // Additional renders with same options should not trigger more redirects
       rerender(<TestComponent />)
 
       // navigateTo should still only be called once
-      expect(navigateTo).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
     })
   })
 
