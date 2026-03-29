@@ -214,7 +214,8 @@
 
 **Priority: 🟡 Medium**
 
-- [ ] **7.1 — Add `CONTRIBUTING.md`** Cover: local dev setup, running tests, PR process, commit message conventions, and how to publish a release.
+- [x] **7.1 — Add `CONTRIBUTING.md`** Cover: local dev setup, running tests, PR process, commit message conventions, and how to publish a release.
+  > `CONTRIBUTING.md` was already present and fully covered the requested scope before this session. Verified here that it includes local setup, test commands, PR workflow, commit conventions, branch-protection notes, and release publishing steps, so the task list was updated to match repository state.
 
 - [ ] **7.2 — Add troubleshooting guide to README** Common issues from `todo.md`: CORS errors, JWKS fetch failures, "Invalid audience", popup blocked, infinite redirect loop. Each should have a cause and fix.
 
