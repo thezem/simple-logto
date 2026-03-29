@@ -131,9 +131,9 @@
 
   > Created `.github/workflows/publish.yml` triggered on `release: created`. Runs the identical CI gate (lint → type-check → test → build) before publishing, so a broken release can never reach npm. Publishes with `--provenance` (npm's signed-attestation feature, requires `id-token: write` permission) for supply-chain transparency. The npm token must be stored as `NPM_TOKEN` in the repo's GitHub Secrets.
 
-- [x] **4.3 — Add `CHANGELOG.md` and commit convention enforcement** Release hygiene should be enforced consistently.
+- [x] **4.3 — Add `CHANGELOG.md` and commit convention guidance** Release hygiene should be documented consistently.
 
-  > Created `CHANGELOG.md` starting at v0.1.8 with an `[Unreleased]` section summarising all Phase 1–4 work. Installed `@commitlint/cli` + `@commitlint/config-conventional` + `husky` as devDependencies. Created `commitlint.config.js` (ESM, extends conventional, adds project-scope enum, 72-char header limit). Initialised husky via `npx husky init` (`prepare: "husky"` in `package.json`): `.husky/pre-commit` runs `npm run lint`; `.husky/commit-msg` runs `commitlint --edit`. `standard-version`/`semantic-release` left as a future choice — the Keep-a-Changelog format used here is compatible with both.
+  > Created `CHANGELOG.md` starting at v0.1.8 with an `[Unreleased]` section summarising all Phase 1–4 work, and documented Conventional Commits guidance in the contributor docs. The older task note claiming active local hook-based enforcement is no longer accurate for the current repository state, so it has been corrected here. `standard-version`/`semantic-release` remains a future choice — the Keep-a-Changelog format used here is compatible with both.
 
 - [x] **4.4 — Add branch protection rules documentation** The merge policy needed to be stated in repo docs even though enforcement lives in GitHub settings.
 

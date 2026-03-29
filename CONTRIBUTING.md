@@ -83,7 +83,7 @@ Conventional Commits are recommended for consistency, especially if you plan to 
 
 **Breaking changes:** append `!` after the type/scope, e.g. `feat(backend)!: change verifyAuth signature`, and add a `BREAKING CHANGE:` footer.
 
-Local Git hook enforcement is enabled via Husky: `pre-commit` runs `npm run lint`, and `commit-msg` runs Commitlint against the Conventional Commits config.
+There is no local Git hook enforcement in this repository. Conventional Commits are still recommended, but they are not currently enforced automatically.
 
 ---
 
