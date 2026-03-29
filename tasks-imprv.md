@@ -183,7 +183,8 @@
 
 **Priority: 🟡 Medium**
 
-- [ ] **6.1 — Change `useAuth` default redirect from `/404` to `/signin`** The default `redirectTo` value in `useAuth` is `/404`. This is a confusing default — unauthenticated users get a 404 page rather than a sign-in prompt. Change the default to `/signin` or make the default `undefined` and throw a helpful error if `requireAuth: true` is set without `redirectTo`.
+- [x] **6.1 — Change `useAuth` default redirect from `/404` to `/signin`** The default `redirectTo` value in `useAuth` is `/404`. This is a confusing default — unauthenticated users get a 404 page rather than a sign-in prompt. Change the default to `/signin` or make the default `undefined` and throw a helpful error if `requireAuth: true` is set without `redirectTo`.
+  > Changed `redirectTo || '/404'` to `redirectTo || '/signin'` in the `middleware === 'auth'` branch of `useAuth`. Updated the JSDoc `@param` description to document the new default. Updated the corresponding test in `useAuth.test.tsx` that was asserting `/404` — it now asserts `/signin` and includes a comment explaining the semantic change. No other call sites reference this default.
 
 - [ ] **6.2 — Add `redirectTo` prop to `CallbackPage`** As noted in Phase 2.4, the callback redirect is hard-coded to `/`. Expose a `redirectTo` prop (and respect `onSuccess` return values) for flexibility.
 
