@@ -194,7 +194,8 @@
 
 - [ ] **6.4 — Fix module-level `customNavigateFunction` singleton** `utils.ts` stores the navigation function as a module-level variable. In micro-frontend or multi-instance test environments, mounting a second `AuthProvider` overwrites it for all instances. Move this to React context so each `AuthProvider` has its own navigation scope.
 
-- [ ] **6.5 — Export all TypeScript types from the package root** Review all types in `types.ts`, `backend/types.ts`, and inline interfaces. Ensure every public type is re-exported from the package entry points so consumers can use them without reaching into internal paths.
+- [x] **6.5 — Export all TypeScript types from the package root** Review all types in `types.ts`, `backend/types.ts`, and inline interfaces. Ensure every public type is re-exported from the package entry points so consumers can use them without reaching into internal paths.
+  > Root `src/index.ts` now re-exports the previously missing frontend public types: `AuthContextType`, `AuthProviderProps`, and `SignInPageProps`. Also removed the duplicate inline `CallbackPageProps` declaration from `callback.tsx` so the shared `src/types.ts` definition is the single source of truth. The backend entrypoint already re-exported `src/backend/types.ts`; README examples were updated to show the full supported type import surface from both `@ouim/simple-logto` and `@ouim/simple-logto/backend`.
 
 - [ ] **6.6 — Add `audience` as an array type in `VerifyAuthOptions`** `audience` is typed as `string` but multi-API setups require multiple audiences. Change type to `string | string[]` and update `verifyTokenClaims` accordingly.
 

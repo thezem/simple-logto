@@ -391,9 +391,27 @@ export default nextConfig
 The package ships typed frontend and backend exports.
 
 ```ts
-import type { LogtoUser, AuthOptions, CallbackPageProps, AdditionalPage, SignInButtonProps } from '@ouim/simple-logto'
+import type {
+  LogtoUser,
+  AuthOptions,
+  AuthContextType,
+  AuthProviderProps,
+  CallbackPageProps,
+  SignInPageProps,
+  AdditionalPage,
+  SignInButtonProps,
+} from '@ouim/simple-logto'
 
-import type { AuthContext, AuthPayload, VerifyAuthOptions } from '@ouim/simple-logto/backend'
+import type {
+  AuthContext,
+  AuthPayload,
+  VerifyAuthOptions,
+  ExpressRequest,
+  ExpressResponse,
+  ExpressNext,
+  NextRequest,
+  NextResponse,
+} from '@ouim/simple-logto/backend'
 ```
 
 ## Positioning
