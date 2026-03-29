@@ -349,9 +349,11 @@
   >
   > Added framework-agnostic backend helpers in `src/backend/authorization.ts`: `hasScopes(subject, scopes, { mode })` for boolean checks and `requireScopes(subject, scopes, { mode })` for assertion-style guards. Both accept either a raw `AuthPayload` or a full `AuthContext`, normalize OAuth-style whitespace-delimited scope strings, and support `'all'` / `'any'` matching without changing existing middleware behavior. Exported them from the backend entrypoint, added focused unit coverage in `src/backend/authorization.test.ts`, and documented the pattern in both README surfaces.
 
-- [ ] **10.2 — Add role-based access control (RBAC) helpers** Roles are a common follow-on need once token verification is stable.
+- [x] **10.2 — Add role-based access control (RBAC) helpers** Roles are a common follow-on need once token verification is stable.
 
   > Add helpers like `hasRole` / `requireRole` against Logto role claims, with explicit docs about expected claim shape and tenant configuration assumptions.
+  >
+  > Extended `src/backend/authorization.ts` with `hasRole(subject, role, { claimKeys })` and `requireRole(subject, role, { claimKeys })`, keeping the API framework-agnostic and aligned with the scope helpers from 10.1. The helpers accept `AuthPayload` or `AuthContext`, read `roles` first and `role` second by default, and allow custom claim names for tenants that map roles into namespaced claims. Added focused unit tests for array claims, string claims, custom claim keys, and error cases, and documented the default claim-shape assumptions plus the custom-claim override path in both backend docs surfaces.
 
 - [ ] **10.3 — Add a frontend permission helper** Conditional rendering against auth state should not require every consumer to re-parse permission data manually.
 

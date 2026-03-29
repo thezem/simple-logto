@@ -187,6 +187,31 @@ requireScopes(auth, ['read:reports', 'write:reports'])
 - `mode` defaults to `'all'`; set `'any'` to accept any matching scope
 - Both helpers accept either a raw `AuthPayload` or a full `AuthContext`
 
+## Role-based Authorization Helpers
+
+Use the exported role helpers when your access control is role-oriented instead of scope-oriented:
+
+```ts
+import { hasRole, requireRole, verifyAuth } from '@ouim/simple-logto/backend'
+
+const auth = await verifyAuth(request, {
+  logtoUrl: 'https://your-logto-domain.com',
+  audience: 'your-api-resource-identifier',
+})
+
+if (!hasRole(auth, 'admin')) {
+  throw new Error('Forbidden')
+}
+
+requireRole(auth, 'admin')
+```
+
+- `hasRole(subject, role, { claimKeys })` returns `true` / `false`
+- `requireRole(subject, role, { claimKeys })` throws a descriptive authorization error
+- Default role claim lookup is `roles`, then `role`
+- If your Logto tenant emits roles under a custom namespaced claim, pass `claimKeys` explicitly
+- The helpers accept either a raw `AuthPayload` or a full `AuthContext`
+
 ## JWKS Cache Controls
 
 The backend verifier keeps a per-process in-memory JWKS cache by default. That is usually the right tradeoff, but you can now control it explicitly when needed:
