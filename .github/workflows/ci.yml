@@ -8,7 +8,7 @@ on:
 
 jobs:
   ci:
-    name: Lint · Type-check · Test · Build
+    name: Lint · Type-check · Test · Build · Smoke
     runs-on: ubuntu-latest
 
     steps:
@@ -39,3 +39,6 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Packed consumer smoke tests
+        run: npm run test:smoke

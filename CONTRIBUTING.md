@@ -45,6 +45,7 @@ npm run lint                                   # ESLint check
 npm run lint:fix                               # ESLint with auto-fix
 npx tsc --project tsconfig.build.json --noEmit # type-check without emitting files
 npm run build                                  # full library build (vite + tsc)
+npm run test:smoke                             # pack dist/ and verify consumer fixtures
 ```
 
 > **Coverage:** `npm run test:coverage` requires `@vitest/coverage-v8` — install it first with `npm install --save-dev @vitest/coverage-v8` if you need a coverage report locally.
@@ -97,10 +98,10 @@ There is no local Git hook enforcement in this repository.
 2. **Write tests** for any new functionality or bug fix.
 3. **Run the full local CI gate** before pushing:
    ```bash
-   npm run lint && npx tsc --project tsconfig.build.json --noEmit && npx vitest run && npm run build
+   npm run lint && npx tsc --project tsconfig.build.json --noEmit && npx vitest run && npm run build && npm run test:smoke
    ```
 4. **Open a PR against `rc`** — not `master`.
-5. Ensure the GitHub Actions **CI** workflow passes (the single `Lint · Type-check · Test · Build` job on Node 24 must be green).
+5. Ensure the GitHub Actions **CI** workflow passes (the single `Lint · Type-check · Test · Build · Smoke` job on Node 24 must be green).
 6. Request a review from a maintainer. At least **one approval** is required before merge.
 7. PRs are merged with **Squash and Merge** to keep a clean linear history on `rc`.
 
@@ -116,7 +117,7 @@ The following rules are enforced in GitHub repository settings (Settings → Bra
 |------|---------|
 | Require a pull request before merging | ✅ Enabled |
 | Required approvals | 1 |
-| Require status checks to pass | ✅ CI (`Lint · Type-check · Test · Build`) |
+| Require status checks to pass | ✅ CI (`Lint · Type-check · Test · Build · Smoke`) |
 | Require branches to be up to date before merging | ✅ Enabled |
 | Restrict who can push directly | Maintainers only |
 | Allow force pushes | ❌ Disabled |
@@ -128,7 +129,7 @@ The following rules are enforced in GitHub repository settings (Settings → Bra
 |------|---------|
 | Require a pull request before merging | ✅ Enabled |
 | Required approvals | 1 |
-| Require status checks to pass | ✅ CI (`Lint · Type-check · Test · Build`) |
+| Require status checks to pass | ✅ CI (`Lint · Type-check · Test · Build · Smoke`) |
 | Allow force pushes | ❌ Disabled |
 
 > **For maintainers:** These rules must be configured in the GitHub UI (or via the GitHub API / Terraform). They cannot be enforced from within the repository itself.

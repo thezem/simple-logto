@@ -259,13 +259,15 @@
 
 **Priority: 🟠 High**
 
-- [ ] **8.1 — Add consumer smoke tests using packed tarballs** Validate the published package the way users consume it, not just the repo source.
+- [x] **8.1 — Add consumer smoke tests using packed tarballs** Validate the published package the way users consume it, not just the repo source.
 
   > Create fixture consumers for at least:
   >
   > - Vite React app importing `@ouim/simple-logto`
   > - Node/Express app importing `@ouim/simple-logto/backend`
   > - Build config importing `@ouim/simple-logto/bundler-config` Use `npm pack` in CI, install the tarball into each fixture, and verify install/build/import behavior. This catches broken `exports`, missing files, incorrect type paths, and CJS/ESM packaging regressions.
+  >
+  > Added a checked-in `smoke-fixtures/` matrix plus `scripts/run-packed-smoke-tests.mjs`, which packs the current build into a tarball, installs that tarball into three isolated fixture apps, and verifies the consumer paths end to end. The Vite fixture runs `tsc` + `vite build` against the root entrypoint, the backend fixture runs `tsc` plus both ESM and CJS runtime imports against `@ouim/simple-logto/backend`, and the bundler fixture does the same for `@ouim/simple-logto/bundler-config`. Wired `npm run test:smoke` into both `ci.yml` and `publish.yml`, and updated the contributor instructions/local gate to include it.
 
 - [ ] **8.2 — Add `SECURITY.md` with a vulnerability disclosure policy** This package handles authentication and should provide a private reporting path.
 
