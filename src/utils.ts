@@ -97,41 +97,14 @@ export const transformUser = (logtoUser: any): LogtoUser | null => {
   }
 }
 
-// Global reference to custom navigate function (can be set by the provider)
-let customNavigateFunction: ((url: string, options?: NavigationOptions) => void) | null = null
-
-/**
- * Set Custom Navigation Function
- *
- * Registers a custom navigation handler for the entire auth library.
- * Used by AuthProvider to enable integration with client-side routers like React Router.
- * If not set, the library falls back to window.location for navigation.
- *
- * @param {Function | null} navigateFn - Navigation function with signature (url: string, options?: NavigationOptions) => void
- *                                        or null to clear the custom function
- * @internal
- *
- * @example
- * import { useNavigate } from 'react-router-dom';
- * import { setCustomNavigate } from '@ouim/simple-logto';
- *
- * // Inside a context or app component
- * const navigate = useNavigate();
- * setCustomNavigate((url) => navigate(url));
- */
-export const setCustomNavigate = (navigateFn: ((url: string, options?: NavigationOptions) => void) | null) => {
-  customNavigateFunction = navigateFn
-}
-
 /**
  * Navigate to a URL
  *
- * Universal navigation function that attempts client-side routing first (History API),
- * then falls back to direct window.location navigation. Respects custom navigation functions
- * set via setCustomNavigate for router integration.
+ * Browser fallback navigation function. AuthProvider-scoped custom navigation is handled
+ * via React context in `navigation.tsx`; this utility only performs History API /
+ * window.location navigation when no scoped router override is present.
  *
  * Supports:
- * - Custom routers (React Router, Next.js navigation, etc.) via setCustomNavigate
  * - Client-side History API for SPAs (pushState/replaceState)
  * - Direct window.location for absolute URLs and fallback
  *
@@ -156,12 +129,6 @@ export const navigateTo = (url: string, options: NavigationOptions = {}): void =
   try {
     // Check if we're in a browser environment
     if (typeof window === 'undefined') return
-
-    // Use custom navigate function if provided (e.g., from React Router)
-    if (customNavigateFunction) {
-      customNavigateFunction(url, options)
-      return
-    }
 
     const { replace = false, force = false } = options
 

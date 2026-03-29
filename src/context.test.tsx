@@ -3,6 +3,7 @@ import { render, screen, waitFor, fireEvent, act } from '@testing-library/react'
 import { ReactNode } from 'react'
 import { AuthProvider } from './context'
 import { useAuthContext } from './context'
+import { useNavigation } from './navigation'
 import type { LogtoConfig } from '@logto/react'
 
 // Mock @logto/react
@@ -29,7 +30,6 @@ vi.mock('./utils', () => ({
     name: claims.name,
     email: claims.email,
   }),
-  setCustomNavigate: vi.fn(),
   jwtCookieUtils: {
     saveToken: vi.fn(),
     removeToken: vi.fn(),
@@ -134,16 +134,24 @@ describe('AuthProvider Context', () => {
 
   it('should apply custom navigation if provided', async () => {
     const customNavigate = vi.fn()
+    const TestComponent = () => {
+      const navigate = useNavigation()
+
+      return <button onClick={() => navigate('/settings')}>Navigate</button>
+    }
 
     render(
       <AuthProvider config={mockConfig} customNavigate={customNavigate}>
-        <div>Test</div>
+        <TestComponent />
       </AuthProvider>,
     )
 
     await waitFor(() => {
-      expect(screen.getByText('Test')).toBeInTheDocument()
+      expect(screen.getByText('Navigate')).toBeInTheDocument()
     })
+
+    fireEvent.click(screen.getByText('Navigate'))
+    expect(customNavigate).toHaveBeenCalledWith('/settings')
   })
 
   it('should return context data with correct initial state', async () => {
@@ -179,6 +187,39 @@ describe('AuthProvider Context', () => {
     await waitFor(() => {
       expect(screen.getByText('Test')).toBeInTheDocument()
     })
+  })
+
+  it('should scope navigation to the nearest AuthProvider', async () => {
+    const outerNavigate = vi.fn()
+    const innerNavigate = vi.fn()
+
+    const NavigationButton = ({ label }: { label: string }) => {
+      const navigate = useNavigation()
+
+      return <button onClick={() => navigate(`/${label.toLowerCase()}`)}>{label}</button>
+    }
+
+    render(
+      <AuthProvider config={mockConfig} customNavigate={outerNavigate}>
+        <NavigationButton label="Outer" />
+        <AuthProvider config={mockConfig} customNavigate={innerNavigate}>
+          <NavigationButton label="Inner" />
+        </AuthProvider>
+      </AuthProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByText('Outer')).toBeInTheDocument()
+      expect(screen.getByText('Inner')).toBeInTheDocument()
+    })
+
+    fireEvent.click(screen.getByText('Outer'))
+    fireEvent.click(screen.getByText('Inner'))
+
+    expect(outerNavigate).toHaveBeenCalledWith('/outer')
+    expect(innerNavigate).toHaveBeenCalledWith('/inner')
+    expect(outerNavigate).toHaveBeenCalledTimes(1)
+    expect(innerNavigate).toHaveBeenCalledTimes(1)
   })
 })
 

@@ -1,7 +1,8 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import { useAuth } from './useAuth'
-import { getInitials, cn, navigateTo } from './utils'
+import { useNavigation } from './navigation'
+import { getInitials, cn } from './utils'
 import { User, LogOut, UserCircle } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
 import {
@@ -70,6 +71,7 @@ export const UserCenter: React.FC<UserCenterProps> = ({
   themeClassnames = 'dark:bg-[#171717] dark:text-slate-200 bg-white text-slate-900',
 }) => {
   const { user, isLoadingUser, signOut, signIn } = useAuth()
+  const navigateTo = useNavigation()
   const [hasMounted, setHasMounted] = useState(false)
 
   useEffect(() => {
