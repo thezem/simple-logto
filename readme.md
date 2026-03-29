@@ -164,11 +164,27 @@ Props:
 - `callbackUrl?`: default auth callback URL
 - `customNavigate?`: custom navigation function for React Router, Next.js, or other SPA routers
 - `enablePopupSignIn?`: enables popup-based sign-in flow
+- `onTokenRefresh?`: called when an already-authenticated session receives a different access token
+- `onAuthError?`: called when auth loading hits a transient or definitive auth error
+- `onSignOut?`: called immediately before the provider initiates local or global sign-out
 
 Example with custom router navigation:
 
 ```tsx
 <AuthProvider config={logtoConfig} callbackUrl="/callback" customNavigate={url => router.push(url)} enablePopupSignIn>
+  <App />
+</AuthProvider>
+```
+
+Lifecycle callback example:
+
+```tsx
+<AuthProvider
+  config={logtoConfig}
+  onTokenRefresh={({ expiresAt }) => analytics.track('token_refreshed', { expiresAt })}
+  onAuthError={({ error, isTransient }) => console.error('auth error', { message: error.message, isTransient })}
+  onSignOut={({ reason }) => analytics.track('signed_out', { reason })}
+>
   <App />
 </AuthProvider>
 ```
