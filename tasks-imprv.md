@@ -199,7 +199,8 @@
 - [x] **6.5 — Export all TypeScript types from the package root** Review all types in `types.ts`, `backend/types.ts`, and inline interfaces. Ensure every public type is re-exported from the package entry points so consumers can use them without reaching into internal paths.
   > Root `src/index.ts` now re-exports the previously missing frontend public types: `AuthContextType`, `AuthProviderProps`, and `SignInPageProps`. Also removed the duplicate inline `CallbackPageProps` declaration from `callback.tsx` so the shared `src/types.ts` definition is the single source of truth. The backend entrypoint already re-exported `src/backend/types.ts`; README examples were updated to show the full supported type import surface from both `@ouim/simple-logto` and `@ouim/simple-logto/backend`.
 
-- [ ] **6.6 — Add `audience` as an array type in `VerifyAuthOptions`** `audience` is typed as `string` but multi-API setups require multiple audiences. Change type to `string | string[]` and update `verifyTokenClaims` accordingly.
+- [x] **6.6 — Add `audience` as an array type in `VerifyAuthOptions`** `audience` is typed as `string` but multi-API setups require multiple audiences. Change type to `string | string[]` and update `verifyTokenClaims` accordingly.
+  > Updated `VerifyAuthOptions.audience` to `string | string[]` and changed `verifyTokenClaims()` to treat both the expected audiences and token `aud` claim as arrays, succeeding on any intersection. Added tests covering matching and non-matching option-side audience arrays, and updated the backend docs/README examples to document the expanded type.
 
 - [x] **6.7 — Make `AuthProvider` warn in development when required config is missing** Add runtime `console.warn` in development mode when `appId`, `endpoint`, or `resources` are missing/empty, pointing to the documentation. Helps catch misconfiguration early.
   > Added a `process.env.NODE_ENV !== 'production'` guarded block at the top of the `validateLogtoConfig` `useEffect` in `AuthProvider`. Emits three distinct `[simple-logto]`-prefixed warnings: one for missing/empty `appId`, one for missing/empty `endpoint`, and one for an empty `resources` array — each with a brief explanation and a link to the relevant Logto docs page. The existing `validateLogtoConfig()` call still runs immediately after and throws for truly invalid configs. Added 4 tests in `context.test.tsx` (`Development Config Warnings` describe block) covering all three warning cases plus the negative case (no resources-warning when resources are present).
@@ -216,7 +217,8 @@
 
 - [ ] **7.2 — Add troubleshooting guide to README** Common issues from `todo.md`: CORS errors, JWKS fetch failures, "Invalid audience", popup blocked, infinite redirect loop. Each should have a cause and fix.
 
-- [ ] **7.3 — Document the implicit `/signin` route requirement for popup flow** The popup flow requires a `/signin` route to exist. This is not mentioned in the README. Add a note in the Popup Sign-In section explaining this dependency.
+- [x] **7.3 — Document the implicit `/signin` route requirement for popup flow** The popup flow requires a `/signin` route to exist. This is not mentioned in the README. Add a note in the Popup Sign-In section explaining this dependency.
+  > Added an explicit note to the `SignInPage` section in `README.md`: popup sign-in still needs a real `/signin` route that renders `SignInPage`, because the popup window navigates there before it starts the Logto flow. This makes the routing dependency visible where consumers configure sign-in UI.
 
 <!-- SKIP this- [ ] **7.4 — Add migration guide for breaking changes** Create `MIGRATION.md` with a section for each minor version bump that introduced breaking changes. Start with the rename from `@ouim/better-logto-react` to `@ouim/simple-logto`. -->
 
