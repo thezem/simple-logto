@@ -281,9 +281,11 @@
   >
   > Added a provider-level proactive refresh timer in `src/context.tsx` that schedules a forced auth reload 60 seconds before token expiry (with a 1-second minimum delay for already-near-expiry tokens). The timer is cleared on sign-out, unmount, and unauthenticated transitions, and a `refreshInFlightRef` guard prevents overlapping timer-driven refresh attempts. Added coverage in `src/context.test.tsx` for successful scheduled refresh, auth-error refresh failure, and the null-access-token fallback that forces logout when the refresh token is effectively expired.
 
-- [ ] **8.4 — Make package scripts cross-platform** NPM scripts should work reliably for contributors on Windows, macOS, and Linux.
+- [x] **8.4 — Make package scripts cross-platform** NPM scripts should work reliably for contributors on Windows, macOS, and Linux.
 
   > Replace shell-specific commands such as `rm -rf dist` with a cross-platform tool like `rimraf`, then verify the documented commands in `AGENTS.md` / `CONTRIBUTING.md` still work on Windows and on CI Linux.
+  >
+  > Replaced the `clean` script in `package.json` from `rm -rf dist` to `rimraf dist` and added `rimraf` as an explicit devDependency so the script no longer depends on POSIX shell semantics. Verified on Windows by running `npm run clean` and `npm run build`; the documented command names in `AGENTS.md` and `CONTRIBUTING.md` remain accurate because only the underlying implementation changed.
 
 - [x] **8.5 — Add explicit runtime support policy** Production libraries should clearly define supported environments and enforce them where reasonable.
 
