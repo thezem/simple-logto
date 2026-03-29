@@ -217,7 +217,8 @@
 - [x] **7.1 — Add `CONTRIBUTING.md`** Cover: local dev setup, running tests, PR process, commit message conventions, and how to publish a release.
   > `CONTRIBUTING.md` was already present and fully covered the requested scope before this session. Verified here that it includes local setup, test commands, PR workflow, commit conventions, branch-protection notes, and release publishing steps, so the task list was updated to match repository state.
 
-- [ ] **7.2 — Add troubleshooting guide to README** Common issues from `todo.md`: CORS errors, JWKS fetch failures, "Invalid audience", popup blocked, infinite redirect loop. Each should have a cause and fix.
+- [x] **7.2 — Add troubleshooting guide to README** Common issues from `todo.md`: CORS errors, JWKS fetch failures, "Invalid audience", popup blocked, infinite redirect loop. Each should have a cause and fix.
+  > Added a dedicated `## Troubleshooting` section to `README.md` covering all requested issues. Each entry now has an explicit cause/fix breakdown focused on the actual integration points in this package: CORS + credentials for backend cookie flows, JWKS endpoint reachability and cache refresh behavior, audience/resource mismatches, popup browser restrictions plus the `/signin` dependency, and common redirect-loop misconfiguration traps around `/callback`, `callbackUrl`, route protection, and custom navigation.
 
 - [x] **7.3 — Document the implicit `/signin` route requirement for popup flow** The popup flow requires a `/signin` route to exist. This is not mentioned in the README. Add a note in the Popup Sign-In section explaining this dependency.
   > Added an explicit note to the `SignInPage` section in `README.md`: popup sign-in still needs a real `/signin` route that renders `SignInPage`, because the popup window navigates there before it starts the Logto flow. This makes the routing dependency visible where consumers configure sign-in UI.
