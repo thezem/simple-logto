@@ -269,9 +269,11 @@
   >
   > Added a checked-in `smoke-fixtures/` matrix plus `scripts/run-packed-smoke-tests.mjs`, which packs the current build into a tarball, installs that tarball into three isolated fixture apps, and verifies the consumer paths end to end. The Vite fixture runs `tsc` + `vite build` against the root entrypoint, the backend fixture runs `tsc` plus both ESM and CJS runtime imports against `@ouim/simple-logto/backend`, and the bundler fixture does the same for `@ouim/simple-logto/bundler-config`. Wired `npm run test:smoke` into both `ci.yml` and `publish.yml`, and updated the contributor instructions/local gate to include it.
 
-- [ ] **8.2 — Add `SECURITY.md` with a vulnerability disclosure policy** This package handles authentication and should provide a private reporting path.
+- [x] **8.2 — Add `SECURITY.md` with a vulnerability disclosure policy** This package handles authentication and should provide a private reporting path.
 
   > Document where vulnerabilities should be reported, whether GitHub Security Advisories are supported, expected disclosure handling, and which versions are supported for security fixes.
+  >
+  > Added repository-root `SECURITY.md` with a private disclosure policy, supported-version guidance tied to the latest release / current `rc` line, explicit instruction not to file public issues, and two reporting paths: GitHub Security Advisories (when enabled) plus `security@ouim.dev`. Also documented acknowledgement targets, coordinated disclosure expectations, and the package surface covered by the policy.
 
 - [ ] **8.3 — Implement proactive token refresh before expiration** Token refresh is still one of the biggest production-readiness gaps.
 
