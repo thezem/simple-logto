@@ -562,10 +562,10 @@ export const AuthProvider = ({ children, config, callbackUrl, customNavigate, en
   // Validate configuration on mount; also emit developer-friendly warnings in non-production
   // builds so misconfiguration is caught early with actionable messages and doc links.
   useEffect(() => {
-    // process.env.NODE_ENV is replaced by bundlers (Vite/Webpack) at build time.
-    // In test and development environments it evaluates at runtime and equals 'test'
-    // or 'development', both of which are !== 'production'.
-    if (process.env.NODE_ENV !== 'production') {
+    // Guard `process` access so browser builds without a Node-style global do not throw.
+    // In most bundlers this still gets inlined at build time when available.
+    const env = typeof process !== 'undefined' ? process.env?.NODE_ENV : undefined
+    if (env !== 'production') {
       if (!config?.appId) {
         console.warn(
           '[simple-logto] AuthProvider: `appId` is missing or empty.\n' +
@@ -588,7 +588,7 @@ export const AuthProvider = ({ children, config, callbackUrl, customNavigate, en
         )
       }
     }
-    validateLogtoConfig(config)
+    validateLogtoConfig(config, { warnOnMissingResources: false })
   }, [config])
 
   // Set the custom navigate function for the entire library
