@@ -225,7 +225,8 @@
 
 <!-- SKIP this- [ ] **7.4 — Add migration guide for breaking changes** Create `MIGRATION.md` with a section for each minor version bump that introduced breaking changes. Start with the rename from `@ouim/better-logto-react` to `@ouim/simple-logto`. -->
 
-- [ ] **7.5 — Add `CODE_OF_CONDUCT.md`** Add the Contributor Covenant or equivalent CoC file as expected by GitHub's community standards checker.
+- [x] **7.5 — Add `CODE_OF_CONDUCT.md`** Add the Contributor Covenant or equivalent CoC file as expected by GitHub's community standards checker.
+  > Added a repository-root `CODE_OF_CONDUCT.md` with an equivalent project policy covering expected behavior, unacceptable conduct, scope, enforcement, and private reporting guidance. Kept it concise and GitHub-community-standards-friendly without introducing extra maintenance burden or project-specific process overhead.
 
 <!-- Skip this- [ ] **7.6 — Add security policy (`SECURITY.md`)** Document how to responsibly report security vulnerabilities (e.g., private GitHub security advisory), the disclosure timeline, and the supported versions. -->
 
