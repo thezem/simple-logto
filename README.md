@@ -73,9 +73,41 @@ GitHub Actions runs the default validation gate on Node `24`, which is the curre
 
 ## Examples
 
-- [example_app/README.md](./example_app/README.md) contains the Vite React playground plus an Express backend-verification sample under [example_app/server/README.md](./example_app/server/README.md).
-- [examples/nextjs-app-router/README.md](./examples/nextjs-app-router/README.md) shows a small Next.js App Router integration with `AuthProvider`, callback/sign-in routes, and `verifyNextAuth`.
-- [docs/notes](./docs/notes) contains implementation notes and archived working docs that are not part of the published package surface.
+### Vite + React + Express
+
+The [example_app/](./example_app/) directory contains a complete Vite React playground:
+
+- **Frontend:** `AuthProvider`, `useAuth`, `UserCenter`, popup sign-in, guest mode
+- **Backend:** Express.js with `createExpressAuthMiddleware`, scope checks, CSRF protection
+- **Setup:** See [example_app/README.md](./example_app/README.md)
+
+### Next.js App Router
+
+[examples/nextjs-app-router/](./examples/nextjs-app-router/) demonstrates:
+
+- `AuthProvider` wrapping the app
+- Sign-in route with `SignInPage`
+- Callback route with `CallbackPage`
+- Protected API route using `verifyNextAuth`
+- Role-based authorization
+- See [examples/nextjs-app-router/README.md](./examples/nextjs-app-router/README.md)
+
+### Smoke Tests
+
+[smoke-fixtures/](./smoke-fixtures/) contains automated tests for:
+
+- Vite + React integration
+- Next.js App Router integration
+- React Router integration
+- Node.js backend verification
+- Bundler compatibility (CommonJS + ESM)
+
+These validate the package works across different bundler and framework combinations.
+
+### Additional Notes
+
+- [docs/notes/](./docs/notes/) contains working implementation notes and architecture decisions
+- [AGENTS.md](./AGENTS.md) documents how AI agents can contribute to this project
 
 ## Quick Start
 
@@ -662,11 +694,56 @@ import type {
 
 If your team eventually needs lower-level control, you can still drop down to the official Logto APIs without throwing your whole auth model away.
 
+## Security & Advanced Features
+
+This package includes **security hardening** that most auth libraries leave to you:
+
+- **CSRF Protection** — Double-submit cookie pattern for backend routes
+- **Cookie Security** — All auth/guest cookies use `Secure`, `SameSite=Strict`
+- **JWKS Cache Invalidation** — Automatic key rotation detection
+- **Payload Validation** — JWT fields validated before use
+- **Network Resilience** — Transient errors auto-retry; auth errors fail fast
+- **Backend Cookie Upgrade** — Helper to set `HttpOnly` cookies from the backend
+
+See [docs/SECURITY_AND_FEATURES.md](./docs/SECURITY_AND_FEATURES.md) for details.
+
+### New in This Release
+
+- `usePermission` hook for frontend permission checks
+- `checkRoleAuthorization` and `checkMultiScopeAuthorization` backend helpers
+- Provider lifecycle callbacks: `onTokenRefresh`, `onAuthError`, `onSignOut`
+- Configurable post-callback redirect on `CallbackPage`
+- Proactive token refresh before expiry
+- Configurable JWKS cache TTL
+
+### Breaking Changes
+
+- `UserCenter` now defaults to **local sign-out** (`global: false`) — much safer. Opt into global logout with `globalSignOut={true}` if you need it.
+
+See [docs/MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md) for upgrade instructions.
+
 ## Repository Notes
 
 - frontend and backend helpers are published from the same package
 - backend helpers are exposed from `@ouim/simple-logto/backend`
 - bundler helpers are exposed from `@ouim/simple-logto/bundler-config`
+
+## Key Documentation
+
+### Core Guides
+
+- **[SECURITY_AND_FEATURES.md](./docs/SECURITY_AND_FEATURES.md)** — Security hardening, CSRF protection, role-based authorization
+- **[PERMISSIONS_AND_AUTHORIZATION.md](./docs/PERMISSIONS_AND_AUTHORIZATION.md)** — Using `usePermission` and backend authorization helpers
+- **[MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md)** — Upgrade guide for v0.1.9+
+- **[src/backend/README.md](./src/backend/README.md)** — Backend verification API reference
+
+### Project Information
+
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Contributing guidelines and branch protection rules
+- **[CI_CD_AND_RELEASES.md](./docs/CI_CD_AND_RELEASES.md)** — GitHub Actions workflows, smoke tests, release process
+- **[CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md)** — Community standards
+- **[CHANGELOG.md](./CHANGELOG.md)** — Version history and release notes
+- **[SECURITY.md](./SECURITY.md)** — Vulnerability disclosure policy
 
 ## Troubleshooting
 
