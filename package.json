@@ -40,6 +40,7 @@
     "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "build:tsc": "tsc",
     "dev": "tsc --watch",
+    "dev:example": "npm --prefix example_app run dev",
     "test": "vitest",
     "test:package": "node ./scripts/run-package-audit.mjs",
     "test:smoke": "node ./scripts/run-packed-smoke-tests.mjs",
