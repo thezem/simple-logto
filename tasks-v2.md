@@ -409,9 +409,10 @@
   > Add at least a bug report template, feature request template, and pull request template aligned with the repo’s release and testing expectations.
   > Added structured bug and feature request issue forms, disabled blank issues, and added a PR template that points contributors at the full local CI gate and the required `rc` base branch.
 
-- [ ] **11.2 — Update Vite to a supported major version** The repo should not sit on stale build tooling longer than necessary.
+- [x] **11.2 — Update Vite to a supported major version** The repo should not sit on stale build tooling longer than necessary.
 
   > Upgrade from Vite 4, run the full CI gate, and verify the generated library output and `bundler-config` helpers still behave correctly.
+  > Upgraded the library build to Vite 6.4.1 instead of Vite 7/8 to preserve the package's current Node 18 support policy, then ran the full local CI gate successfully (`lint`, type-check, tests, build, size, package audit, and smoke fixtures).
 
 - [ ] **11.3 — Remove leftover repo artifacts** Source control should not keep irrelevant backup files.
 
