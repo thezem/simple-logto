@@ -59,6 +59,7 @@ const createMockJwt = (exp: number) => {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  sessionStorage.clear()
   vi.mocked(useLogto).mockReturnValue(createMockLogtoContext())
 })
 
@@ -646,6 +647,77 @@ describe('AuthProvider Lifecycle Callbacks', () => {
       callbackUrl: '/signed-out',
     })
     expect(logtoSignOut).not.toHaveBeenCalled()
+  })
+
+  it('keeps app-local sign-out isolated from the tenant session across auth refreshes', async () => {
+    const logtoSignOut = vi.fn()
+    const getIdTokenClaims = vi.fn().mockResolvedValue({
+      sub: 'user-123',
+      name: 'Test User',
+      email: 'test@example.com',
+    })
+    const getAccessToken = vi.fn().mockResolvedValue('mock-token')
+
+    vi.mocked(useLogto).mockReturnValue(
+      createMockLogtoContext({
+        isAuthenticated: true,
+        getIdTokenClaims,
+        getAccessToken,
+        signOut: logtoSignOut,
+      }),
+    )
+
+    render(
+      <AuthProvider config={mockConfig}>
+        <AuthControls />
+      </AuthProvider>,
+    )
+
+    await waitFor(() => expect(screen.getByText('Sign Out')).toBeInTheDocument())
+    await waitFor(() => expect(getIdTokenClaims).toHaveBeenCalledTimes(1))
+
+    fireEvent.click(screen.getByText('Sign Out'))
+
+    expect(logtoSignOut).not.toHaveBeenCalled()
+    expect(sessionStorage.getItem('simple_logto_local_signout')).toBe('true')
+
+    act(() => {
+      window.dispatchEvent(new CustomEvent('auth-state-changed'))
+    })
+
+    await waitFor(() => expect(jwtCookieUtils.removeToken).toHaveBeenCalled())
+    expect(getIdTokenClaims).toHaveBeenCalledTimes(1)
+    expect(getAccessToken).toHaveBeenCalledTimes(1)
+    expect(logtoSignOut).not.toHaveBeenCalled()
+  })
+
+  it('clears the local sign-out override when sign-in starts again', async () => {
+    const signIn = vi.fn()
+
+    sessionStorage.setItem('simple_logto_local_signout', 'true')
+
+    vi.mocked(useLogto).mockReturnValue(
+      createMockLogtoContext({
+        signIn,
+      }),
+    )
+
+    const SignInControl = () => {
+      const { signIn: beginSignIn } = useAuthContext()
+      return <button onClick={() => beginSignIn('/dashboard')}>Sign In</button>
+    }
+
+    render(
+      <AuthProvider config={mockConfig}>
+        <SignInControl />
+      </AuthProvider>,
+    )
+
+    await waitFor(() => expect(screen.getByText('Sign In')).toBeInTheDocument())
+    fireEvent.click(screen.getByText('Sign In'))
+
+    expect(sessionStorage.getItem('simple_logto_local_signout')).toBeNull()
+    expect(signIn).toHaveBeenCalledWith('/dashboard')
   })
 
   it('swallows errors thrown by consumer lifecycle callbacks without breaking sign-out', async () => {
