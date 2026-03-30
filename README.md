@@ -75,6 +75,7 @@ GitHub Actions runs the default validation gate on Node `24`, which is the curre
 
 - [example_app/README.md](./example_app/README.md) contains the Vite React playground plus an Express backend-verification sample under [example_app/server/README.md](./example_app/server/README.md).
 - [examples/nextjs-app-router/README.md](./examples/nextjs-app-router/README.md) shows a small Next.js App Router integration with `AuthProvider`, callback/sign-in routes, and `verifyNextAuth`.
+- [docs/notes](./docs/notes) contains implementation notes and archived working docs that are not part of the published package surface.
 
 ## Quick Start
 
@@ -153,9 +154,9 @@ export function Navbar() {
 }
 ```
 
-![UserCenter](image.png)
+![UserCenter](docs/assets/image.png)
 
-![UserCenter logged in](image-1.png)
+![UserCenter logged in](docs/assets/image-1.png)
 
 ## Frontend API
 

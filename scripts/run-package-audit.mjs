@@ -11,7 +11,7 @@ const npmExecutable = process.platform === 'win32' ? 'npm.cmd' : 'npm'
 const npmRunner = process.env.npm_execpath ? process.execPath : npmExecutable
 
 const packageJson = JSON.parse(readFileSync(path.join(repoRoot, 'package.json'), 'utf8'))
-const readme = readFileSync(path.join(repoRoot, 'readme.md'), 'utf8')
+const readme = readFileSync(path.join(repoRoot, 'README.md'), 'utf8')
 
 if (!existsSync(path.join(repoRoot, 'dist'))) {
   fail('Package audit requires an existing dist/ build. Run `npm run build` first.')
@@ -31,7 +31,7 @@ if (!packEntry || !Array.isArray(packEntry.files)) {
 const packedFiles = new Set(packEntry.files.map(file => file.path))
 const expectedPackedFiles = new Set([
   'package.json',
-  'readme.md',
+  'README.md',
   ...collectPackageEntryFiles(packageJson),
 ])
 

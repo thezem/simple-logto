@@ -17,3 +17,4 @@ example_app/.env
 *.rej
 prompt.md
 .tmp
+vitest-results.txt
