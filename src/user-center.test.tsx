@@ -3,10 +3,16 @@ import { render, screen } from '@testing-library/react'
 import { UserCenter } from './user-center'
 import type { LogtoUser } from './types'
 
+const mockNavigate = vi.fn()
+
 // Mock useAuth hook
 const mockUseAuth = vi.fn()
 vi.mock('./useAuth', () => ({
   useAuth: () => mockUseAuth(),
+}))
+
+vi.mock('./navigation', () => ({
+  useNavigation: () => mockNavigate,
 }))
 
 // Mock utility functions
@@ -19,7 +25,6 @@ vi.mock('./utils', () => ({
       .join('')
   },
   cn: (...classes: any[]) => classes.filter(Boolean).join(' '),
-  navigateTo: vi.fn(),
 }))
 
 // Mock UI components
@@ -218,7 +223,28 @@ describe('UserCenter Component', () => {
 
       expect(signOut).toHaveBeenCalledWith({
         callbackUrl: 'https://example.com/current-page',
-        global: true,
+        global: false,
+      })
+    })
+
+    it('should default to local sign-out for safer account-menu behavior', () => {
+      const signOut = vi.fn()
+      mockUseAuth.mockReturnValue({
+        ...defaultMockAuth,
+        user: mockUser,
+        isLoadingUser: false,
+        signOut,
+      })
+
+      render(<UserCenter />)
+
+      const buttons = screen.getAllByTestId('button')
+      const signOutButton = buttons.find(btn => btn.textContent?.includes('Sign out'))
+      signOutButton?.click()
+
+      expect(signOut).toHaveBeenCalledWith({
+        callbackUrl: 'https://example.com/current-page',
+        global: false,
       })
     })
 
@@ -261,7 +287,7 @@ describe('UserCenter Component', () => {
 
       expect(signOut).toHaveBeenCalledWith({
         callbackUrl: customUrl,
-        global: true,
+        global: false,
       })
     })
   })
@@ -347,12 +373,12 @@ describe('UserCenter Component', () => {
 
       render(<UserCenter additionalPages={additionalPages} />)
 
-      // The navigateTo is already mocked in the vi.mock('./utils') at the top
-      // Find and click the settings item
       const items = screen.getAllByTestId('dropdown-item')
       const settingsItem = items.find(item => item.textContent?.includes('Settings'))
 
-      expect(settingsItem).toBeTruthy()
+      settingsItem?.click()
+
+      expect(mockNavigate).toHaveBeenCalledWith('/settings')
     })
 
     it('should render separators only when additional pages exist', () => {
@@ -482,7 +508,7 @@ describe('UserCenter Component', () => {
 
       expect(signOut).toHaveBeenCalledWith({
         callbackUrl: 'https://example.com/current-page',
-        global: true,
+        global: false,
       })
     })
   })

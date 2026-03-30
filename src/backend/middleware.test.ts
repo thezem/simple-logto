@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { createExpressAuthMiddleware, verifyNextAuth, verifyLogtoToken } from './verify-auth'
-import type { VerifyAuthOptions, _AuthContext, _ExpressRequest, _ExpressResponse, _ExpressNext } from './types'
+import type { VerifyAuthOptions } from './types'
 
 // Mock jose library
 vi.mock('jose', () => ({
@@ -356,7 +356,7 @@ describe('Express/Next.js Middleware Auth Flow', () => {
         expect(nextCalled).toBe(true)
       })
 
-      it('should generate guest ID when not in cookies', async () => {
+      it('should leave guestId undefined when no guest cookie present', async () => {
         const guestOptions = { ...mockOptions, allowGuest: true }
         const middleware = createExpressAuthMiddleware(guestOptions)
 
@@ -380,8 +380,9 @@ describe('Express/Next.js Middleware Auth Flow', () => {
         })
 
         expect(req.auth).toBeDefined()
-        expect(req.auth.guestId).toBeTruthy()
-        expect(typeof req.auth.guestId).toBe('string')
+        expect(req.auth.isGuest).toBe(true)
+        // No guest cookie was present — backend must not fabricate an ID
+        expect(req.auth.guestId).toBeUndefined()
       })
     })
 
@@ -596,7 +597,8 @@ describe('Express/Next.js Middleware Auth Flow', () => {
 
         const result = await verifyNextAuth(request, guestOptions)
 
-        expect(result.success).toBe(false) // No token, but guest is allowed
+        // Guest sessions are success:true — callers use auth.isGuest to distinguish
+        expect(result.success).toBe(true)
         expect(result.auth?.isGuest).toBe(true)
         expect(result.auth?.isAuthenticated).toBe(false)
       })
@@ -625,7 +627,8 @@ describe('Express/Next.js Middleware Auth Flow', () => {
 
         const result = await verifyNextAuth(request, guestOptions)
 
-        expect(result.success).toBe(false)
+        // Guest fallback is a valid session — success:true, callers check auth.isGuest
+        expect(result.success).toBe(true)
         expect(result.auth?.isGuest).toBe(true)
       })
 
@@ -693,7 +696,7 @@ describe('Express/Next.js Middleware Auth Flow', () => {
         expect(result).toHaveProperty('error')
       })
 
-      it('should return auth context in error response when guest mode enabled', async () => {
+      it('should return auth context with success:true when guest mode enabled', async () => {
         const guestOptions = { ...mockOptions, allowGuest: true }
 
         const request = {
@@ -707,7 +710,9 @@ describe('Express/Next.js Middleware Auth Flow', () => {
 
         const result = await verifyNextAuth(request, guestOptions)
 
-        expect(result).toHaveProperty('success', false)
+        // A valid guest session returns success:true so callers don't have to treat
+        // guests as an error — they use auth.isGuest to distinguish the two cases.
+        expect(result).toHaveProperty('success', true)
         expect(result).toHaveProperty('auth')
         expect(result.auth?.isGuest).toBe(true)
       })

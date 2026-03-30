@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useRef } from 'react'
 import { useHandleSignInCallback } from '@logto/react'
+import type { CallbackPageProps } from './types.js'
 
 /**
  * CallbackPage Component
@@ -35,13 +36,6 @@ import { useHandleSignInCallback } from '@logto/react'
  * @returns {React.FC} Component that handles the auth callback flow
  * @see {@link SignInPage} for the sign-in page component
  */
-export interface CallbackPageProps {
-  className?: string
-  loadingComponent?: React.ReactNode
-  successComponent?: React.ReactNode
-  onSuccess?: () => void
-  onError?: (error: Error) => void
-}
 
 // Define keyframes for spin animation
 const spinKeyframes = `
@@ -51,7 +45,7 @@ const spinKeyframes = `
   }
 `
 
-export const CallbackPage: React.FC<CallbackPageProps> = ({ className = '', loadingComponent, successComponent, onSuccess, onError }) => {
+export const CallbackPage: React.FC<CallbackPageProps> = ({ className = '', loadingComponent, successComponent, onSuccess, onError, redirectTo = '/' }) => {
   const callbackHandled = useRef(false)
 
   useEffect(() => {
@@ -77,9 +71,9 @@ export const CallbackPage: React.FC<CallbackPageProps> = ({ className = '', load
       if (onSuccess) {
         onSuccess()
       }
-      // If not a popup, redirect to the home page or a specific URL
+      // If not a popup, redirect to the configured destination (defaults to '/')
       if (!isPopup) {
-        window.location.href = '/'
+        window.location.href = redirectTo
       } else {
         // Clean up the popup flag before closing
         sessionStorage.removeItem('simple_logto_popup_flow')

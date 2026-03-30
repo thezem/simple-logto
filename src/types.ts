@@ -23,6 +23,11 @@ export interface AuthOptions {
   navigationOptions?: NavigationOptions
 }
 
+export interface UsePermissionOptions {
+  claimKeys?: string[]
+  mode?: 'all' | 'any'
+}
+
 export interface AuthContextType {
   user: LogtoUser | null
   isLoadingUser: boolean
@@ -32,12 +37,37 @@ export interface AuthContextType {
   enablePopupSignIn?: boolean
 }
 
+export type AuthSignOutReason = 'user' | 'auth_error' | 'missing_access_token' | 'transient_error_limit'
+
+export interface AuthTokenRefreshEvent {
+  user: LogtoUser
+  accessToken: string
+  expiresAt?: number
+  previousExpiresAt?: number
+}
+
+export interface AuthErrorEvent {
+  error: Error
+  isTransient: boolean
+  willSignOut: boolean
+}
+
+export interface AuthSignOutEvent {
+  reason: AuthSignOutReason
+  global: boolean
+  callbackUrl?: string
+  error?: Error
+}
+
 export interface AuthProviderProps {
   children: React.ReactNode
   config: LogtoConfig
   callbackUrl?: string
   customNavigate?: (url: string, options?: NavigationOptions) => void
   enablePopupSignIn?: boolean
+  onTokenRefresh?: (event: AuthTokenRefreshEvent) => void
+  onAuthError?: (event: AuthErrorEvent) => void
+  onSignOut?: (event: AuthSignOutEvent) => void
 }
 
 export interface CallbackPageProps {
@@ -46,6 +76,14 @@ export interface CallbackPageProps {
   successComponent?: React.ReactNode
   onSuccess?: () => void
   onError?: (error: Error) => void
+  /** URL to redirect to after successful authentication. Defaults to `'/'`. */
+  redirectTo?: string
+}
+
+export interface SignInPageProps {
+  className?: string
+  loadingComponent?: React.ReactNode
+  errorComponent?: React.ReactNode | ((error: Error) => React.ReactNode)
 }
 
 export interface AdditionalPage {

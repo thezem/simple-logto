@@ -1,6 +1,6 @@
 {
   "name": "@ouim/simple-logto",
-  "version": "0.1.8",
+  "version": "0.1.9-beta.0",
   "description": "A simpler way to use @logto/react with prebuilt UI components and hooks for fast authentication setup",
   "type": "module",
   "main": "dist/index.js",
@@ -8,6 +8,9 @@
   "types": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": "^18.18.0 || ^20.0.0 || ^22.0.0 || ^24.0.0"
   },
   "exports": {
     ".": {
@@ -37,18 +40,22 @@
     "build": "vite build && tsc --project tsconfig.build.json --emitDeclarationOnly",
     "build:tsc": "tsc",
     "dev": "tsc --watch",
+    "dev:example": "npm --prefix example_app run dev",
     "test": "vitest",
+    "test:package": "node ./scripts/run-package-audit.mjs",
+    "test:size": "node ./scripts/check-bundle-size.mjs",
+    "test:smoke": "node ./scripts/run-packed-smoke-tests.mjs",
     "test:coverage": "vitest --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "clean": "rm -rf dist",
+    "clean": "rimraf dist",
     "prepublishOnly": "npm run clean && npm run build",
-    "publish": "npm publish --access public"
+    "publish": "npm publish --access public --provenance"
   },
   "peerDependencies": {
     "@logto/react": "^3.0.0 || ^4.0.0",
-    "react": "^17.0.0 || ^19.0.0",
-    "react-dom": "^17.0.0 || ^19.0.0"
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
+    "react-dom": "^17.0.0 || ^18.0.0 || ^19.0.0"
   },
   "dependencies": {
     "@fingerprintjs/fingerprintjs": "^4.6.2",
@@ -61,8 +68,7 @@
     "cookie-parser": "^1.4.7",
     "jose": "^6.0.11",
     "lucide-react": "^0.575.0",
-    "tailwind-merge": "^2.2.1",
-    "vitest": "^4.0.18"
+    "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^8.56.0",
@@ -70,18 +76,25 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/cookie-parser": "^1.4.10",
-    "@types/node": "^22.15.30",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.19.15",
     "@types/react": "^18.0.37",
     "@types/react-dom": "^18.0.11",
+    "@types/supertest": "^7.2.0",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "express": "^5.2.1",
     "happy-dom": "^20.7.0",
+    "rimraf": "^5.0.10",
+    "supertest": "^7.2.2",
     "typescript": "^5.0.4",
-    "vite": "^4.0.0"
+    "vite": "^6.4.1",
+    "vitest": "^4.0.18"
   },
   "keywords": [
     "logto",
@@ -93,6 +106,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thezem/simple-logto.git"
+    "url": "git+https://github.com/ouim-me/simple-logto.git"
   }
 }

@@ -1,9 +1,10 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { useAuth } from './useAuth'
-import { getInitials, cn, navigateTo } from './utils'
+import { useAuth } from './useAuth.js'
+import { useNavigation } from './navigation.js'
+import { getInitials, cn } from './utils.js'
 import { User, LogOut, UserCircle } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar.js'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +12,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './components/ui/dropdown-menu'
-import { Button } from './components/ui/button'
-import type { AdditionalPage } from './types'
+} from './components/ui/dropdown-menu.js'
+import { Button } from './components/ui/button.js'
+import type { AdditionalPage } from './types.js'
 
 /**
  * UserCenter Component
@@ -31,7 +32,7 @@ import type { AdditionalPage } from './types'
  *
  * @component
  * @param {string} [className] - CSS classes for the container element
- * @param {boolean} [globalSignOut=true] - Whether to perform global sign-out (logs out of entire Logto ecosystem) or local only
+ * @param {boolean} [globalSignOut=false] - Whether to perform global sign-out (logs out of entire Logto ecosystem) or local only
  * @param {string} [signoutCallbackUrl] - URL to redirect to after sign-out (default: current page)
  * @param {AdditionalPage[]} [additionalPages] - Array of custom pages/links to show in dropdown
  * @param {string} [themeClassnames] - Tailwind classnames for theming (light/dark mode)
@@ -64,12 +65,13 @@ export interface UserCenterProps {
 
 export const UserCenter: React.FC<UserCenterProps> = ({
   className = '',
-  globalSignOut = true,
+  globalSignOut = false,
   signoutCallbackUrl,
   additionalPages = [],
-  themeClassnames = 'dark:bg-[#171717] dark:text-slate-200 bg-white text-slate-900',
+  themeClassnames = 'light:bg-stone-800 light:border-stone-700 light:text-stone-200',
 }) => {
   const { user, isLoadingUser, signOut, signIn } = useAuth()
+  const navigateTo = useNavigation()
   const [hasMounted, setHasMounted] = useState(false)
 
   useEffect(() => {
