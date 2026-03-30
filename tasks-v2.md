@@ -404,9 +404,10 @@
 
 **Priority: 🟢 Low**
 
-- [ ] **11.1 — Add GitHub issue and PR templates** Improve contribution quality and reduce repetitive triage.
+- [x] **11.1 — Add GitHub issue and PR templates** Improve contribution quality and reduce repetitive triage.
 
   > Add at least a bug report template, feature request template, and pull request template aligned with the repo’s release and testing expectations.
+  > Added structured bug and feature request issue forms, disabled blank issues, and added a PR template that points contributors at the full local CI gate and the required `rc` base branch.
 
 - [ ] **11.2 — Update Vite to a supported major version** The repo should not sit on stale build tooling longer than necessary.
 
@@ -420,6 +421,6 @@
 
   > Add small examples for at least React + backend verification and Next.js integration. These can later double as smoke-test fixtures.
 
-- [ ] **11.5 — Add migration and integration guides if adoption grows** These are useful once the core package stabilizes.
+<!-- - [ ] Skip this **11.5 — Add migration and integration guides if adoption grows** These are useful once the core package stabilizes. -->
 
-  > Candidates include migration from raw `@logto/react`, React Router integration, Next.js App Router integration, and guest-mode guidance. Do this after the base API and release process settle.
+> Candidates include migration from raw `@logto/react`, React Router integration, Next.js App Router integration, and guest-mode guidance. Do this after the base API and release process settle.
