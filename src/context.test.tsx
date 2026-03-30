@@ -724,7 +724,7 @@ describe('Popup Sign-in Flow', () => {
   it('warns and returns early (no crash, no interval) when the popup is blocked', async () => {
     // Browser blocked the popup — window.open returns null
     // eslint-disable-next-line @typescript-eslint/no-extra-semi
-    (window.open as ReturnType<typeof vi.fn>).mockReturnValue(null)
+    ;(window.open as ReturnType<typeof vi.fn>).mockReturnValue(null)
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     render(
@@ -807,6 +807,79 @@ describe('Popup Sign-in Flow', () => {
 
     expect(mockPopup.close).toHaveBeenCalledOnce()
   })
+
+  it('keeps retrying popup auth rehydration until the parent Logto state flips authenticated', async () => {
+    const popupEventDelayMs = 500
+    const popupRetryDelayMs = 250
+    let popupAuthReady = false
+    const getIdTokenClaims = vi.fn().mockResolvedValue({
+      sub: 'user-123',
+      name: 'Test User',
+      email: 'test@example.com',
+    })
+    const getAccessToken = vi.fn().mockResolvedValue('popup-access-token')
+    const addELSpy = vi.spyOn(window, 'addEventListener')
+
+    vi.mocked(useLogto).mockImplementation(() =>
+      createMockLogtoContext({
+        isAuthenticated: popupAuthReady,
+        getIdTokenClaims,
+        getAccessToken,
+      }),
+    )
+
+    const PopupAuthProbe = () => {
+      const { user, signIn } = useAuthContext()
+
+      return (
+        <div>
+          <button onClick={() => signIn(undefined, true)}>Open Popup</button>
+          <div>user: {user ? user.id : 'none'}</div>
+        </div>
+      )
+    }
+
+    const renderPopupTree = () => (
+      <AuthProvider config={mockConfig} enablePopupSignIn>
+        <PopupAuthProbe />
+      </AuthProvider>
+    )
+
+    const { rerender } = render(renderPopupTree())
+
+    await waitFor(() => expect(screen.getByText('Open Popup')).toBeInTheDocument())
+    expect(screen.getByText('user: none')).toBeInTheDocument()
+
+    vi.useFakeTimers()
+
+    fireEvent.click(screen.getByText('Open Popup'))
+
+    const msgCalls = addELSpy.mock.calls.filter(([t]) => t === 'message')
+    const messageHandler = msgCalls[msgCalls.length - 1][1] as (e: unknown) => void
+
+    await act(async () => {
+      messageHandler({
+        origin: window.location.origin,
+        source: mockPopup,
+        data: { type: 'SIGNIN_SUCCESS' },
+      })
+      vi.advanceTimersByTime(popupEventDelayMs)
+      vi.advanceTimersToNextTimer()
+    })
+
+    expect(screen.getByText('user: none')).toBeInTheDocument()
+    expect(getIdTokenClaims).not.toHaveBeenCalled()
+
+    popupAuthReady = true
+    rerender(renderPopupTree())
+
+    await act(async () => {
+      vi.advanceTimersByTime(popupRetryDelayMs)
+    })
+    expect(screen.getByText('user: user-123')).toBeInTheDocument()
+    expect(getIdTokenClaims).toHaveBeenCalledTimes(1)
+    expect(getAccessToken).toHaveBeenCalledTimes(1)
+  }, 10000)
 
   // ── 5. Cross-origin messages are ignored ─────────────────────────────────
 
