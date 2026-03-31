@@ -1,4 +1,4 @@
-# Contributing to `@ouim/simple-logto`
+# Contributing to `@ouim/logto-authkit`
 
 Thank you for your interest in contributing! This document covers everything you need to get started.
 
@@ -129,7 +129,7 @@ The following rules are enforced in GitHub repository settings (Settings → Bra
 
 ## Rename Release Sequence
 
-For the `@ouim/simple-logto` -> `@ouim/logto-authkit` migration, use this release order:
+For the `@ouim/logto-authkit` -> `@ouim/logto-authkit` migration, use this release order:
 
 1. Merge the final old-name messaging PR to `master`.
 2. Tag `v0.2.1`.
@@ -139,7 +139,7 @@ For the `@ouim/simple-logto` -> `@ouim/logto-authkit` migration, use this releas
 6. Publish the `v0.3.0` GitHub release first so the new package reaches npm first.
 7. Verify `@ouim/logto-authkit` is live.
 8. Publish the drafted `v0.2.1` release if the final old-name release should also be pushed to npm.
-9. Deprecate `@ouim/simple-logto` on npm after the new package is confirmed live.
+9. Deprecate `@ouim/logto-authkit` on npm after the new package is confirmed live.
 
 This repository publishes to npm from the GitHub `release.published` event, not from a git tag push by itself.
 

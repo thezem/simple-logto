@@ -26,12 +26,12 @@ export default defineConfig({
     lib: {
       entry: {
         index: resolve(__dirname, 'src/index.ts'),
-        'backend/index': resolve(__dirname, 'src/backend/index.ts'),
+        'server/index': resolve(__dirname, 'src/server/index.ts'),
         // expose bundler helpers as a separate bundle so consumers
         // can import them without pulling in the full React-based library
         'bundler-config': resolve(__dirname, 'src/bundler-config.ts'),
       },
-      name: 'BetterLogtoReact',
+      name: 'LogtoAuthKit',
       formats: ['es', 'cjs'],
     },
     rollupOptions: {

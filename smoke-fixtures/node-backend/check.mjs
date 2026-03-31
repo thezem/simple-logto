@@ -7,7 +7,7 @@ import {
   requireScopes,
   verifyAuth,
   verifyNextAuth,
-} from '@ouim/simple-logto/backend'
+} from '@ouim/logto-authkit/server'
 
 const middleware = createExpressAuthMiddleware({
   logtoUrl: 'https://example.logto.app',

@@ -1,4 +1,4 @@
-# Improvement Tasks v2 — `@ouim/simple-logto`
+# Improvement Tasks v2 — `@ouim/logto-authkit`
 
 > Cleaned-up roadmap for making this library production-ready and open-source quality. This version keeps the completed tasks and their implementation notes, removes stale duplication, and separates real release blockers from optional ecosystem work.
 
@@ -52,7 +52,7 @@
 
 - [x] **1.2 — Fix stale package name in `bundler-config.ts`** `getBundlerConfig()` referenced `@ouim/better-logto-react`, which is no longer the package name.
 
-  > Replaced `@ouim/better-logto-react` with `@ouim/simple-logto` in the `optimizeDeps.include` array inside the `vite` case of `getBundlerConfig()`. The stale name was the only occurrence in the file.
+  > Replaced `@ouim/better-logto-react` with `@ouim/logto-authkit` in the `optimizeDeps.include` array inside the `vite` case of `getBundlerConfig()`. The stale name was the only occurrence in the file.
 
 - [x] **1.3 — Fix React peer dependency range to include React 18** The original peer range skipped React 18, which caused unnecessary install warnings for most users.
 
@@ -120,7 +120,7 @@
 
 - [x] **3.2 — Add CSRF protection helpers for backend middleware** Backend auth helpers validated JWTs but did not help consumers protect state-changing routes.
 
-  > Created `src/backend/csrf.ts` (exported from `src/backend/index.ts`) implementing the double-submit cookie pattern with no new dependencies. Exports: `generateCsrfToken()` (uses `globalThis.crypto.randomUUID` / `node:crypto` fallback), `buildCsrfCookieHeader()` (non-HttpOnly by design — JS must read it), `createCsrfMiddleware()` (Express: issues cookie on GET, validates on POST/PUT/PATCH/DELETE), `verifyCsrfToken()` (Next.js Route Handler helper returning `{ valid, error? }`), and the `CSRF_COOKIE_NAME` / `CSRF_HEADER_NAME` constants. The module header documents the full threat model: what CSRF is, how the double-submit pattern blocks it via same-origin policy, and explicit limitations (defence-in-depth only, not a CSP replacement).
+  > Created `src/server/csrf.ts` (exported from `src/server/index.ts`) implementing the double-submit cookie pattern with no new dependencies. Exports: `generateCsrfToken()` (uses `globalThis.crypto.randomUUID` / `node:crypto` fallback), `buildCsrfCookieHeader()` (non-HttpOnly by design — JS must read it), `createCsrfMiddleware()` (Express: issues cookie on GET, validates on POST/PUT/PATCH/DELETE), `verifyCsrfToken()` (Next.js Route Handler helper returning `{ valid, error? }`), and the `CSRF_COOKIE_NAME` / `CSRF_HEADER_NAME` constants. The module header documents the full threat model: what CSRF is, how the double-submit pattern blocks it via same-origin policy, and explicit limitations (defence-in-depth only, not a CSP replacement).
 
 - [x] **3.3 — Remove insecure backend UUID fallback** The prior task was to replace a `Math.random()` fallback, but the code path was dead.
 
@@ -208,11 +208,11 @@
 
 - [x] **5.8 — Add integration test for Express middleware** The Express middleware needed an end-to-end test using a real app.
 
-  > Added `src/backend/express.integration.test.ts` using a real Express app plus `supertest`. The suite mounts `createExpressAuthMiddleware()` and covers the requested end-to-end cases: valid auth cookie, expired token rejection, missing-token 401, guest-cookie fallback, and required-scope enforcement. Added `express`/`supertest` and their TypeScript types as devDependencies to support this integration-level coverage without changing the published package surface.
+  > Added `src/server/express.integration.test.ts` using a real Express app plus `supertest`. The suite mounts `createExpressAuthMiddleware()` and covers the requested end-to-end cases: valid auth cookie, expired token rejection, missing-token 401, guest-cookie fallback, and required-scope enforcement. Added `express`/`supertest` and their TypeScript types as devDependencies to support this integration-level coverage without changing the published package surface.
 
 - [x] **5.9 — Add integration test for Next.js route handler** `verifyNextAuth` needed route-level verification without requiring a full Next runtime.
 
-  > Added `src/backend/next-route.integration.test.ts` with a small route-handler harness around `verifyNextAuth()`. The test uses a real `Headers` object and a minimal request adapter rather than the full Next runtime, which avoids adding `next` as a dev dependency while still covering route-level behavior. It verifies the requested scenarios: authenticated JWT session, guest-cookie flow, missing-token 401, and explicit `allowGuest: false` with no token.
+  > Added `src/server/next-route.integration.test.ts` with a small route-handler harness around `verifyNextAuth()`. The test uses a real `Headers` object and a minimal request adapter rather than the full Next runtime, which avoids adding `next` as a dev dependency while still covering route-level behavior. It verifies the requested scenarios: authenticated JWT session, guest-cookie flow, missing-token 401, and explicit `allowGuest: false` with no token.
 
 - [x] **5.10 — Set minimum coverage thresholds in Vitest config** CI should fail on real coverage regressions.
 
@@ -240,7 +240,7 @@
 
 - [x] **6.4 — Export all public TypeScript types from package entrypoints** Consumers should not need internal import paths for supported types.
 
-  > Root `src/index.ts` now re-exports the previously missing frontend public types: `AuthContextType`, `AuthProviderProps`, and `SignInPageProps`. Also removed the duplicate inline `CallbackPageProps` declaration from `callback.tsx` so the shared `src/types.ts` definition is the single source of truth. The backend entrypoint already re-exported `src/backend/types.ts`; README examples were updated to show the full supported type import surface from both `@ouim/simple-logto` and `@ouim/simple-logto/backend`.
+  > Root `src/index.ts` now re-exports the previously missing frontend public types: `AuthContextType`, `AuthProviderProps`, and `SignInPageProps`. Also removed the duplicate inline `CallbackPageProps` declaration from `callback.tsx` so the shared `src/types.ts` definition is the single source of truth. The backend entrypoint already re-exported `src/server/types.ts`; README examples were updated to show the full supported type import surface from both `@ouim/logto-authkit` and `@ouim/logto-authkit/server`.
 
 - [x] **6.5 — Add `audience` array support to `VerifyAuthOptions`** Multi-resource APIs need `string | string[]` rather than a single audience string.
 
@@ -248,7 +248,7 @@
 
 - [x] **6.6 — Add development warnings for missing required config** Consumers should get fast feedback before they hit runtime auth failures.
 
-  > Added a `process.env.NODE_ENV !== 'production'` guarded block at the top of the `validateLogtoConfig` `useEffect` in `AuthProvider`. Emits three distinct `[simple-logto]`-prefixed warnings: one for missing/empty `appId`, one for missing/empty `endpoint`, and one for an empty `resources` array — each with a brief explanation and a link to the relevant Logto docs page. The existing `validateLogtoConfig()` call still runs immediately after and throws for truly invalid configs. Added 4 tests in `context.test.tsx` (`Development Config Warnings` describe block) covering all three warning cases plus the negative case (no resources-warning when resources are present).
+  > Added a `process.env.NODE_ENV !== 'production'` guarded block at the top of the `validateLogtoConfig` `useEffect` in `AuthProvider`. Emits three distinct `[logto-authkit]`-prefixed warnings: one for missing/empty `appId`, one for missing/empty `endpoint`, and one for an empty `resources` array — each with a brief explanation and a link to the relevant Logto docs page. The existing `validateLogtoConfig()` call still runs immediately after and throws for truly invalid configs. Added 4 tests in `context.test.tsx` (`Development Config Warnings` describe block) covering all three warning cases plus the negative case (no resources-warning when resources are present).
 
 ---
 
@@ -290,11 +290,11 @@
 
   > Create fixture consumers for at least:
   >
-  > - Vite React app importing `@ouim/simple-logto`
-  > - Node/Express app importing `@ouim/simple-logto/backend`
-  > - Build config importing `@ouim/simple-logto/bundler-config` Use `npm pack` in CI, install the tarball into each fixture, and verify install/build/import behavior. This catches broken `exports`, missing files, incorrect type paths, and CJS/ESM packaging regressions.
+  > - Vite React app importing `@ouim/logto-authkit`
+  > - Node/Express app importing `@ouim/logto-authkit/server`
+  > - Build config importing `@ouim/logto-authkit/bundler-config` Use `npm pack` in CI, install the tarball into each fixture, and verify install/build/import behavior. This catches broken `exports`, missing files, incorrect type paths, and CJS/ESM packaging regressions.
   >
-  > Added a checked-in `smoke-fixtures/` matrix plus `scripts/run-packed-smoke-tests.mjs`, which packs the current build into a tarball, installs that tarball into three isolated fixture apps, and verifies the consumer paths end to end. The Vite fixture runs `tsc` + `vite build` against the root entrypoint, the backend fixture runs `tsc` plus both ESM and CJS runtime imports against `@ouim/simple-logto/backend`, and the bundler fixture does the same for `@ouim/simple-logto/bundler-config`. Wired `npm run test:smoke` into both `ci.yml` and `publish.yml`, and updated the contributor instructions/local gate to include it.
+  > Added a checked-in `smoke-fixtures/` matrix plus `scripts/run-packed-smoke-tests.mjs`, which packs the current build into a tarball, installs that tarball into three isolated fixture apps, and verifies the consumer paths end to end. The Vite fixture runs `tsc` + `vite build` against the root entrypoint, the backend fixture runs `tsc` plus both ESM and CJS runtime imports against `@ouim/logto-authkit/server`, and the bundler fixture does the same for `@ouim/logto-authkit/bundler-config`. Wired `npm run test:smoke` into both `ci.yml` and `publish.yml`, and updated the contributor instructions/local gate to include it.
 
 - [x] **8.2 — Add `SECURITY.md` with a vulnerability disclosure policy** This package handles authentication and should provide a private reporting path.
 
@@ -324,7 +324,7 @@
 
   > Add a CI step that verifies the final tarball contains the expected `dist` files and entrypoints, and that README examples only use supported public imports. This should fail if an export path is removed, renamed, or points at a missing declaration file.
   >
-  > Added `scripts/run-package-audit.mjs` plus `npm run test:package`. The audit runs `npm pack --json`, verifies the tarball contains the required published metadata files and every file referenced by `main` / `module` / `types` / `exports`, and scans README code fences for `@ouim/simple-logto` imports so unsupported subpaths fail the build. Wired it into both GitHub Actions workflows after `npm run build`, and updated the local gate docs in `AGENTS.md` and `CONTRIBUTING.md` to include the new check.
+  > Added `scripts/run-package-audit.mjs` plus `npm run test:package`. The audit runs `npm pack --json`, verifies the tarball contains the required published metadata files and every file referenced by `main` / `module` / `types` / `exports`, and scans README code fences for `@ouim/logto-authkit` imports so unsupported subpaths fail the build. Wired it into both GitHub Actions workflows after `npm run build`, and updated the local gate docs in `AGENTS.md` and `CONTRIBUTING.md` to include the new check.
 
 ---
 
@@ -356,13 +356,13 @@
 
   > Document supported SSR patterns, hydration expectations, and router integration examples for React Router and Next.js. Add small helper docs or examples before adding more runtime abstraction.
   >
-  > Added an explicit `SSR And Router Boundaries` section to the main `README.md` describing the client-only surface (`AuthProvider`, `useAuth`, `SignInPage`, `CallbackPage`, `UserCenter`), hydration expectations, and the rule that backend authorization must come from `@ouim/simple-logto/backend` during SSR. Also added concrete React Router and Next.js App Router examples, plus matching backend-side guidance in `src/backend/README.md` so the frontend/server split is documented in both docs entrypoints.
+  > Added an explicit `SSR And Router Boundaries` section to the main `README.md` describing the client-only surface (`AuthProvider`, `useAuth`, `SignInPage`, `CallbackPage`, `UserCenter`), hydration expectations, and the rule that backend authorization must come from `@ouim/logto-authkit/server` during SSR. Also added concrete React Router and Next.js App Router examples, plus matching backend-side guidance in `src/server/README.md` so the frontend/server split is documented in both docs entrypoints.
 
 - [x] **9.5 — Add bundle-size monitoring in CI** This package ships UI and auth helpers; size regressions should be visible.
 
   > Add a lightweight size check or comparison job in CI so new dependencies or accidental bundling changes are caught early.
   >
-  > Added `scripts/check-bundle-size.mjs` plus `npm run test:size` to enforce size budgets for all published JavaScript entrypoints (`dist/index`, `dist/backend/index`, and `dist/bundler-config`, both ESM and CJS). The script reports raw and gzip sizes, fails the build if any artifact exceeds its budget, and is now wired into both `.github/workflows/ci.yml` and `.github/workflows/publish.yml` immediately after `npm run build`. Updated `AGENTS.md` and `CONTRIBUTING.md` so the documented local pre-push gate includes the new size check as well.
+  > Added `scripts/check-bundle-size.mjs` plus `npm run test:size` to enforce size budgets for all published JavaScript entrypoints (`dist/index`, `dist/server/index`, and `dist/bundler-config`, both ESM and CJS). The script reports raw and gzip sizes, fails the build if any artifact exceeds its budget, and is now wired into both `.github/workflows/ci.yml` and `.github/workflows/publish.yml` immediately after `npm run build`. Updated `AGENTS.md` and `CONTRIBUTING.md` so the documented local pre-push gate includes the new size check as well.
 
 ---
 
@@ -376,13 +376,13 @@
 
   > Provide helpers such as `requireScopes(scopes, { mode: 'all' | 'any' })` without coupling them too tightly to Express or Next-specific middleware.
   >
-  > Added framework-agnostic backend helpers in `src/backend/authorization.ts`: `hasScopes(subject, scopes, { mode })` for boolean checks and `requireScopes(subject, scopes, { mode })` for assertion-style guards. Both accept either a raw `AuthPayload` or a full `AuthContext`, normalize OAuth-style whitespace-delimited scope strings, and support `'all'` / `'any'` matching without changing existing middleware behavior. Exported them from the backend entrypoint, added focused unit coverage in `src/backend/authorization.test.ts`, and documented the pattern in both README surfaces.
+  > Added framework-agnostic backend helpers in `src/server/authorization.ts`: `hasScopes(subject, scopes, { mode })` for boolean checks and `requireScopes(subject, scopes, { mode })` for assertion-style guards. Both accept either a raw `AuthPayload` or a full `AuthContext`, normalize OAuth-style whitespace-delimited scope strings, and support `'all'` / `'any'` matching without changing existing middleware behavior. Exported them from the backend entrypoint, added focused unit coverage in `src/server/authorization.test.ts`, and documented the pattern in both README surfaces.
 
 - [x] **10.2 — Add role-based access control (RBAC) helpers** Roles are a common follow-on need once token verification is stable.
 
   > Add helpers like `hasRole` / `requireRole` against Logto role claims, with explicit docs about expected claim shape and tenant configuration assumptions.
   >
-  > Extended `src/backend/authorization.ts` with `hasRole(subject, role, { claimKeys })` and `requireRole(subject, role, { claimKeys })`, keeping the API framework-agnostic and aligned with the scope helpers from 10.1. The helpers accept `AuthPayload` or `AuthContext`, read `roles` first and `role` second by default, and allow custom claim names for tenants that map roles into namespaced claims. Added focused unit tests for array claims, string claims, custom claim keys, and error cases, and documented the default claim-shape assumptions plus the custom-claim override path in both backend docs surfaces.
+  > Extended `src/server/authorization.ts` with `hasRole(subject, role, { claimKeys })` and `requireRole(subject, role, { claimKeys })`, keeping the API framework-agnostic and aligned with the scope helpers from 10.1. The helpers accept `AuthPayload` or `AuthContext`, read `roles` first and `role` second by default, and allow custom claim names for tenants that map roles into namespaced claims. Added focused unit tests for array claims, string claims, custom claim keys, and error cases, and documented the default claim-shape assumptions plus the custom-claim override path in both backend docs surfaces.
 
 - [x] **10.3 — Add a frontend permission helper** Conditional rendering against auth state should not require every consumer to re-parse permission data manually.
 

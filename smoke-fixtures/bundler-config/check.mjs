@@ -1,4 +1,4 @@
-import { getBundlerConfig, nextjsConfig, viteConfig, webpackConfig } from '@ouim/simple-logto/bundler-config'
+import { getBundlerConfig, nextjsConfig, viteConfig, webpackConfig } from '@ouim/logto-authkit/bundler-config'
 
 const vite = getBundlerConfig('vite')
 

@@ -1,4 +1,4 @@
-# Project Guidelines for simple-logto
+# Project Guidelines for logto-authkit
 
 This repository contains a small monolithic library for simplifying Logto authentication in React apps. It packages both frontend UI/hooks/contexts and backend JWT verification helpers in a single npm module.
 
@@ -11,15 +11,15 @@ This repository contains a small monolithic library for simplifying Logto authen
   - `src/*.ts(x)` files show idiomatic exports, functional React components, and `async/await` usage.
   - Keep imports ordered logically (external packages first, then internal paths).
 - All new exports must be re‑exported in `src/index.ts` so they become part of the package API.
-- Backend helpers live under `src/backend` with CJS/ESM output controlled by the `exports` field in `package.json`.
+- Backend helpers live under `src/server` with CJS/ESM output controlled by the `exports` field in `package.json`.
 
 ## Architecture
 
 - **Frontend**: React components/hooks under `src/` such as `AuthProvider`, `useAuth`, `UserCenter`, `CallbackPage`, etc. UI primitives are in `src/components/ui` and `src/components/utils`.
 - **Bundler configuration helpers** exist in `bundler-config.ts` for Vite, Webpack and Next.js.
-- **Backend**: JWT verification helpers and middleware live in `src/backend`. This code is shipped as part of the npm package and is independent of React.
+- **Backend**: JWT verification helpers and middleware live in `src/server`. This code is shipped as part of the npm package and is independent of React.
 - Types are declared in `src/types.ts` and exported through the index file.
-- Examples of usage are available in markdown files at the root (`CALLBACK_EXAMPLE.md`, `INFINITE_RENDER_FIX.md`) and in `src/backend/README.md`.
+- Examples of usage are available in markdown files at the root (`CALLBACK_EXAMPLE.md`, `INFINITE_RENDER_FIX.md`) and in `src/server/README.md`.
 
 ## Build and Test
 
@@ -50,19 +50,19 @@ Test setup is in `vitest.setup.ts` (imports `@testing-library/jest-dom` matchers
 | `src/useAuth.test.tsx` | `useAuth` hook — state, redirect, middleware |
 | `src/callback.test.tsx` | `CallbackPage` redirect and popup flows |
 | `src/user-center.test.tsx` | `UserCenter` component rendering and navigation |
-| `src/backend/verify-auth.test.ts` | JWT verification, JWKS cache, audience/issuer checks |
-| `src/backend/middleware.test.ts` | Express and Next.js middleware — valid/invalid/guest tokens |
+| `src/server/verify-auth.test.ts` | JWT verification, JWKS cache, audience/issuer checks |
+| `src/server/middleware.test.ts` | Express and Next.js middleware — valid/invalid/guest tokens |
 
 **Coverage policy:** All new functionality must be accompanied by unit tests. Backend code (JWT verification, middleware) should target ≥ 80 % statement coverage. PRs that reduce coverage will be flagged in review.
 
 ## Project Conventions
 
-- The package is published under the scope `@ouim/simple-logto`.
+- The package is published under the scope `@ouim/logto-authkit`.
 - Keep `peerDependencies` up‑to‑date (`@logto/react`, `react`, `react-dom`).
 - Avoid introducing runtime dependencies that will bloat consumer bundles; most of the frontend is zero‑dependencies apart from UI primitives already used.
 - When touching backend code, remember it is used by Node.js and must not rely on DOM APIs.
-- Documentation is primarily the root `readme.md` and `src/backend/README.md`—update these when behavior changes.
-- Example servers are provided in `src/backend/example-express.js` and other files; they illustrate how middleware is used and can be executed via Node for manual testing.
+- Documentation is primarily the root `readme.md` and `src/server/README.md`—update these when behavior changes.
+- Example servers are provided in `src/server/example-express.js` and other files; they illustrate how middleware is used and can be executed via Node for manual testing.
 
 ## Integration Points
 

@@ -1,6 +1,6 @@
 # Repository Files Overview
 
-This document provides a high-level overview of the key files in the `@ouim/simple-logto` repository.
+This document provides a high-level overview of the key files in the `@ouim/logto-authkit` repository.
 
 ## Root-Level Documentation
 
@@ -33,9 +33,9 @@ src/
 └── *.test.tsx                Comprehensive vitest unit and integration tests
 ```
 
-### Backend (`src/backend/`)
+### Backend (`src/server/`)
 ```
-src/backend/
+src/server/
 ├── index.ts                  Backend entrypoint — exports all backend APIs
 ├── README.md                 Backend API reference with examples
 ├── verify-auth.ts            Core JWT verification logic
@@ -174,7 +174,7 @@ See package.json for the full list.
 ## Key Statistics
 
 - **Total files:** ~130 (including tests and examples)
-- **Core library files:** ~25 (src/*.ts + src/backend/*.ts)
+- **Core library files:** ~25 (src/*.ts + src/server/*.ts)
 - **Test files:** ~20 (vitest coverage)
 - **Example apps:** 2 (Vite + Next.js)
 - **Smoke fixtures:** 5 (comprehensive integration tests)
@@ -220,9 +220,9 @@ CSRF:
 
 ```
 Published Entrypoints:
-├── @ouim/simple-logto              src/index.ts
-├── @ouim/simple-logto/backend      src/backend/index.ts
-└── @ouim/simple-logto/bundler-config  src/bundler-config.ts
+├── @ouim/logto-authkit              src/index.ts
+├── @ouim/logto-authkit/server      src/server/index.ts
+└── @ouim/logto-authkit/bundler-config  src/bundler-config.ts
 
 Distribution:
 ├── dist/esm/                        ES modules (for bundlers)

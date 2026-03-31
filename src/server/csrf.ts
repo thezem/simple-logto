@@ -1,5 +1,5 @@
 /**
- * CSRF Protection Helpers for `@ouim/simple-logto`
+ * CSRF Protection Helpers for `@ouim/logto-authkit`
  *
  * Implements the **Double-Submit Cookie** pattern — the most portable stateless
  * CSRF defence that requires no server-side session storage.
@@ -58,8 +58,8 @@
  *
  * ```ts
  * import express from 'express';
- * import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend';
- * import { createCsrfMiddleware, generateCsrfToken, buildCsrfCookieHeader } from '@ouim/simple-logto/backend';
+ * import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server';
+ * import { createCsrfMiddleware, generateCsrfToken, buildCsrfCookieHeader } from '@ouim/logto-authkit/server';
  *
  * const app = express();
  *
@@ -96,7 +96,7 @@
  * ```ts
  * // app/api/data/route.ts
  * import { NextRequest, NextResponse } from 'next/server';
- * import { verifyCsrfToken, generateCsrfToken, buildCsrfCookieHeader } from '@ouim/simple-logto/backend';
+ * import { verifyCsrfToken, generateCsrfToken, buildCsrfCookieHeader } from '@ouim/logto-authkit/server';
  *
  * // GET — issue a fresh CSRF token
  * export async function GET() {
@@ -148,7 +148,7 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS', 'TRACE'])
  * sufficient for CSRF tokens.
  *
  * @example
- * import { generateCsrfToken } from '@ouim/simple-logto/backend';
+ * import { generateCsrfToken } from '@ouim/logto-authkit/server';
  *
  * const csrfToken = generateCsrfToken();
  * // Store it in a cookie or send it to the client in a bootstrap response
@@ -181,7 +181,7 @@ export function generateCsrfToken(): string {
  * @returns {string} A complete `Set-Cookie` header value.
  *
  * @example
- * import { generateCsrfToken, buildCsrfCookieHeader } from '@ouim/simple-logto/backend';
+ * import { generateCsrfToken, buildCsrfCookieHeader } from '@ouim/logto-authkit/server';
  *
  * const token = generateCsrfToken();
  * const cookie = buildCsrfCookieHeader(token, { sameSite: 'Strict' });
@@ -252,7 +252,7 @@ export interface CsrfMiddlewareOptions {
  * even on unauthenticated requests (defence-in-depth).
  *
  * @example
- * import { createCsrfMiddleware } from '@ouim/simple-logto/backend';
+ * import { createCsrfMiddleware } from '@ouim/logto-authkit/server';
  *
  * // Apply globally
  * app.use(createCsrfMiddleware());
@@ -333,7 +333,7 @@ export interface CsrfVerifyResult {
  * @returns {CsrfVerifyResult}
  *
  * @example
- * import { verifyCsrfToken } from '@ouim/simple-logto/backend';
+ * import { verifyCsrfToken } from '@ouim/logto-authkit/server';
  *
  * export async function POST(request: NextRequest) {
  *   const csrf = verifyCsrfToken(request);

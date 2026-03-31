@@ -1,11 +1,11 @@
 # Linked Local Package Troubleshooting
 
-This guide covers integration issues that show up when consuming `@ouim/simple-logto` from a local path such as:
+This guide covers integration issues that show up when consuming `@ouim/logto-authkit` from a local path such as:
 
 ```json
 {
   "dependencies": {
-    "@ouim/simple-logto": "file:../simple-logto"
+    "@ouim/logto-authkit": "file:../simple-logto"
   }
 }
 ```
@@ -23,15 +23,15 @@ You may see one of these errors:
 
 ## Why this happens
 
-When `@ouim/simple-logto` is linked from a local folder, the consumer app can accidentally resolve:
+When `@ouim/logto-authkit` is linked from a local folder, the consumer app can accidentally resolve:
 
 - `react` from the app
 - `react-dom` from the app
-- but `@ouim/simple-logto` and `@logto/react` from the linked package's own dependency tree
+- but `@ouim/logto-authkit` and `@logto/react` from the linked package's own dependency tree
 
 That gives you multiple React instances in one app, which breaks hooks.
 
-There is a second integration trap in Vite apps: if you spread `viteConfig` from `@ouim/simple-logto` and then replace `resolve.alias` instead of merging it, you can accidentally drop or override aliases that the package expects.
+There is a second integration trap in Vite apps: if you spread `viteConfig` from `@ouim/logto-authkit` and then replace `resolve.alias` instead of merging it, you can accidentally drop or override aliases that the package expects.
 
 ## Next.js App Router: `"use client"` errors
 
@@ -44,7 +44,7 @@ You import `SignInPage`, `CallbackPage`, `AuthProvider`, or another frontend exp
 
 ### Cause
 
-The frontend entry for `@ouim/simple-logto` must preserve the module-level `'use client'` directive in the built output. If that directive is stripped during packaging, Next.js treats the package entry as a Server Component import path.
+The frontend entry for `@ouim/logto-authkit` must preserve the module-level `'use client'` directive in the built output. If that directive is stripped during packaging, Next.js treats the package entry as a Server Component import path.
 
 ### Fix
 
@@ -77,7 +77,7 @@ Example:
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react-swc'
 import path from 'path'
-import { viteConfig } from '@ouim/simple-logto'
+import { viteConfig } from '@ouim/logto-authkit'
 
 export default defineConfig(() => {
   const appReactPath = path.resolve(__dirname, './node_modules/react')
@@ -112,7 +112,7 @@ Your app builds in development but fails during `vite build`, often with a `jose
 
 ### Cause
 
-You spread `viteConfig` from `@ouim/simple-logto`, then replace `resolve` or `resolve.alias` completely. That discards alias entries provided by the package.
+You spread `viteConfig` from `@ouim/logto-authkit`, then replace `resolve` or `resolve.alias` completely. That discards alias entries provided by the package.
 
 ### Fix
 
@@ -135,7 +135,7 @@ If your app needs to override one of the inherited aliases, do it explicitly aft
 If you suspect duplicate React, check:
 
 ```bash
-npm ls react react-dom @logto/react @ouim/simple-logto
+npm ls react react-dom @logto/react @ouim/logto-authkit
 ```
 
 If the linked package shows its own installed `react` version that differs from the app, fix bundler resolution first.

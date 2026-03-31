@@ -482,7 +482,7 @@ export async function verifyLogtoToken(token: string, options: VerifyAuthOptions
  *
  * @example
  * import express from 'express';
- * import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend';
+ * import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server';
  *
  * const app = express();
  *
@@ -618,7 +618,7 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
  *
  * @example
  * // In a Next.js API route — reject unauthenticated requests
- * import { verifyNextAuth } from '@ouim/simple-logto/backend';
+ * import { verifyNextAuth } from '@ouim/logto-authkit/server';
  *
  * export async function GET(request) {
  *   const result = await verifyNextAuth(request, {
@@ -639,7 +639,7 @@ export function createExpressAuthMiddleware(options: VerifyAuthOptions) {
  * @example
  * // In Next.js middleware — allow guests, block fully unauthenticated requests
  * import { NextRequest, NextResponse } from 'next/server';
- * import { verifyNextAuth } from '@ouim/simple-logto/backend';
+ * import { verifyNextAuth } from '@ouim/logto-authkit/server';
  *
  * export async function middleware(request: NextRequest) {
  *   const result = await verifyNextAuth(request, {
@@ -865,7 +865,7 @@ export async function verifyAuth(
  * @example
  * // Express — upgrade to HttpOnly after verifying the token
  * import express from 'express';
- * import { verifyLogtoToken, buildAuthCookieHeader } from '@ouim/simple-logto/backend';
+ * import { verifyLogtoToken, buildAuthCookieHeader } from '@ouim/logto-authkit/server';
  *
  * app.post('/api/session', async (req, res) => {
  *   const token = req.body.token; // JWT sent from the frontend after Logto callback
@@ -877,7 +877,7 @@ export async function verifyAuth(
  *
  * @example
  * // Next.js Route Handler — same pattern
- * import { verifyLogtoToken, buildAuthCookieHeader } from '@ouim/simple-logto/backend';
+ * import { verifyLogtoToken, buildAuthCookieHeader } from '@ouim/logto-authkit/server';
  *
  * export async function POST(request: Request) {
  *   const { token } = await request.json();

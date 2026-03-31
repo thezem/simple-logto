@@ -1,6 +1,6 @@
 # CI/CD & Release Process
 
-This document describes the GitHub Actions workflows, smoke tests, and release process for `@ouim/simple-logto`.
+This document describes the GitHub Actions workflows, smoke tests, and release process for `@ouim/logto-authkit`.
 
 ## Overview
 
@@ -200,7 +200,7 @@ Automatically publishes to npm when a GitHub release is published.
 
 ### Rename-Specific Release Order
 
-For the `@ouim/simple-logto` -> `@ouim/logto-authkit` transition:
+For the `@ouim/logto-authkit` -> `@ouim/logto-authkit` transition:
 
 1. Merge the final old-name messaging PR.
 2. Tag `v0.2.1`.
@@ -210,7 +210,7 @@ For the `@ouim/simple-logto` -> `@ouim/logto-authkit` transition:
 6. Publish the `v0.3.0` release first so `@ouim/logto-authkit` reaches npm first.
 7. Verify the new package is live.
 8. Publish `v0.2.1` only after that if the final old-name line should also be shipped.
-9. Deprecate `@ouim/simple-logto` on npm after the new package is confirmed live.
+9. Deprecate `@ouim/logto-authkit` on npm after the new package is confirmed live.
 
 ### Build Provenance
 
@@ -239,7 +239,7 @@ npm run check-bundle-size
 Reports:
 
 - Main entrypoint size (gzipped + uncompressed)
-- `/backend` entrypoint size
+- `/server` entrypoint size
 - `/bundler-config` entrypoint size
 - Tree-shaking effectiveness
 
@@ -248,7 +248,7 @@ Reports:
 Rough targets (not hard limits):
 
 - Main: < 50 KB gzipped
-- `/backend`: < 20 KB gzipped
+- `/server`: < 20 KB gzipped
 - `/bundler-config`: < 10 KB gzipped
 
 If a change significantly increases size, consider:
@@ -334,7 +334,7 @@ npm run validate          # Lint → Type-check → Test → Build
    ```json
    {
      "dependencies": {
-       "@ouim/simple-logto": "file:../../"
+       "@ouim/logto-authkit": "file:../../"
      }
    }
    ```
@@ -396,7 +396,7 @@ After releasing:
 
 - [ ] GitHub Release was created
 - [ ] npm publish workflow completed successfully
-- [ ] Package is accessible: `npm view @ouim/simple-logto@latest`
+- [ ] Package is accessible: `npm view @ouim/logto-authkit@latest`
 - [ ] Announce in changelog/releases
 
 ---

@@ -1,10 +1,6 @@
 // Configuration helper for resolving jose library issues
 // This can be imported and used in consuming project's bundler configuration
 
-import { warnPackageDeprecation } from './deprecation-warning.js'
-
-warnPackageDeprecation('bundler-config')
-
 interface BundlerConfig {
   optimizeDeps?: {
     include: string[]
@@ -28,7 +24,7 @@ interface BundlerConfig {
  *
  * @example
  * // Vite configuration
- * import { getBundlerConfig } from '@ouim/simple-logto';
+ * import { getBundlerConfig } from '@ouim/logto-authkit';
  * import { defineConfig } from 'vite';
  *
  * export default defineConfig({
@@ -38,7 +34,7 @@ interface BundlerConfig {
  *
  * @example
  * // Webpack configuration
- * import { getBundlerConfig } from '@ouim/simple-logto';
+ * import { getBundlerConfig } from '@ouim/logto-authkit';
  *
  * module.exports = {
  *   ...getBundlerConfig('webpack'),
@@ -47,7 +43,7 @@ interface BundlerConfig {
  *
  * @example
  * // Next.js configuration
- * const { getBundlerConfig } = require('@ouim/simple-logto');
+ * const { getBundlerConfig } = require('@ouim/logto-authkit');
  *
  * module.exports = {
  *   ...getBundlerConfig('nextjs'),
@@ -88,7 +84,7 @@ export const getBundlerConfig = (bundler: 'vite' | 'webpack' | 'nextjs' = 'vite'
  * Use this directly in your vite.config.ts if you don't need custom configuration.
  *
  * @example
- * import { viteConfig } from '@ouim/simple-logto';
+ * import { viteConfig } from '@ouim/logto-authkit';
  * import { defineConfig } from 'vite';
  *
  * export default defineConfig({ ...viteConfig });
@@ -100,7 +96,7 @@ export const viteConfig = getBundlerConfig('vite')
  * Use this directly in your webpack.config.js if you don't need custom configuration.
  *
  * @example
- * const { webpackConfig } = require('@ouim/simple-logto');
+ * const { webpackConfig } = require('@ouim/logto-authkit');
  *
  * module.exports = { ...webpackConfig, entry: './src/index.js' };
  */
@@ -111,7 +107,7 @@ export const webpackConfig = getBundlerConfig('webpack')
  * Use this directly in your next.config.js if you don't need custom configuration.
  *
  * @example
- * const { nextjsConfig } = require('@ouim/simple-logto');
+ * const { nextjsConfig } = require('@ouim/logto-authkit');
  *
  * module.exports = { ...nextjsConfig };
  */

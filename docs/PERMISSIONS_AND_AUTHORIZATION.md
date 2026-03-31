@@ -1,6 +1,6 @@
 # Permissions & Role-Based Authorization
 
-This guide covers permission and role-based authorization using the built-in helpers in `@ouim/simple-logto`.
+This guide covers permission and role-based authorization using the built-in helpers in `@ouim/logto-authkit`.
 
 ## Overview
 
@@ -20,7 +20,7 @@ The library provides tools for both **frontend conditional rendering** and **bac
 Check if the current user has a specific permission:
 
 ```jsx
-import { usePermission } from '@ouim/simple-logto'
+import { usePermission } from '@ouim/logto-authkit'
 
 export function DeleteButton() {
   const canDelete = usePermission('content:delete')
@@ -89,7 +89,7 @@ export function ProtectedFeature() {
 To explicitly check if the user is authenticated:
 
 ```jsx
-import { useAuth } from '@ouim/simple-logto'
+import { useAuth } from '@ouim/logto-authkit'
 
 export function Dashboard() {
   const { user, isLoadingUser } = useAuth()
@@ -134,7 +134,7 @@ All formats are supported and normalized automatically.
 ### Single Role Check
 
 ```javascript
-import { checkRoleAuthorization, verifyNextAuth } from '@ouim/simple-logto/backend'
+import { checkRoleAuthorization, verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function GET(request) {
   const authResult = await verifyNextAuth(request, {
@@ -160,7 +160,7 @@ export async function GET(request) {
 ### Multiple Scope Check
 
 ```javascript
-import { checkMultiScopeAuthorization, verifyNextAuth } from '@ouim/simple-logto/backend'
+import { checkMultiScopeAuthorization, verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function POST(request) {
   const authResult = await verifyNextAuth(request, {
@@ -201,7 +201,7 @@ const hasModerationAccess = checkMultiScopeAuthorization(
 ### Express.js Middleware
 
 ```javascript
-import { createExpressAuthMiddleware, checkRoleAuthorization } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware, checkRoleAuthorization } from '@ouim/logto-authkit/server'
 
 const authMiddleware = createExpressAuthMiddleware({
   logtoUrl: process.env.LOGTO_URL,
@@ -251,7 +251,7 @@ app.delete('/api/posts/:id', authMiddleware, requireRole('admin'), (req, res) =>
 Check if the user is the owner of a resource:
 
 ```javascript
-import { verifyNextAuth } from '@ouim/simple-logto/backend'
+import { verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function PUT(request, { params }) {
   const authResult = await verifyNextAuth(request, {
@@ -444,5 +444,5 @@ export async function GET(request) {
 ## See Also
 
 - [docs/SECURITY_AND_FEATURES.md](./SECURITY_AND_FEATURES.md) — Role authorization details
-- [src/backend/README.md](../src/backend/README.md) — Backend verification API
+- [src/server/README.md](../src/server/README.md) — Backend verification API
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — How to contribute permission-related improvements

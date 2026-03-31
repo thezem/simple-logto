@@ -1,5 +1,5 @@
 {
-  "name": "simple-logto-example-nextjs-app-router",
+  "name": "logto-authkit-example-nextjs-app-router",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,7 +8,7 @@
   },
   "dependencies": {
     "@logto/react": "^4.0.12",
-    "@ouim/simple-logto": "file:../..",
+    "@ouim/logto-authkit": "file:../..",
     "next": "^15.5.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

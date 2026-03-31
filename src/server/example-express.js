@@ -1,8 +1,8 @@
-// Example Express.js server using @ouim/simple-logto/backend
+// Example Express.js server using @ouim/logto-authkit/server
 // Cookies are parsed automatically by the middleware; you no longer need to
 // install or provide `cookie-parser` separately.
 import express from 'express'
-import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server'
 
 const app = express()
 app.use(express.json())

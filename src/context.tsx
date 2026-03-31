@@ -912,21 +912,21 @@ export const AuthProvider = ({
     if (env !== 'production') {
       if (!config?.appId) {
         console.warn(
-          '[simple-logto] AuthProvider: `appId` is missing or empty.\n' +
+          '[logto-authkit] AuthProvider: `appId` is missing or empty.\n' +
             'Every Logto application needs an App ID from the Logto Console.\n' +
             'Docs: https://docs.logto.io/quick-starts',
         )
       }
       if (!config?.endpoint) {
         console.warn(
-          '[simple-logto] AuthProvider: `endpoint` (your Logto tenant URL) is missing or empty.\n' +
+          '[logto-authkit] AuthProvider: `endpoint` (your Logto tenant URL) is missing or empty.\n' +
             'Example: "https://your-tenant.logto.app"\n' +
             'Docs: https://docs.logto.io/quick-starts',
         )
       }
       if (!config?.resources?.length) {
         console.warn(
-          '[simple-logto] AuthProvider: No `resources` (API identifiers) are configured.\n' +
+          '[logto-authkit] AuthProvider: No `resources` (API identifiers) are configured.\n' +
             'Backend JWT verification requires at least one API resource.\n' +
             'Docs: https://docs.logto.io/docs/recipes/configure-jwt-token',
         )

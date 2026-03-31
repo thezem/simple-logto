@@ -7,7 +7,7 @@ import {
   UserCenter,
   UserScope,
   useAuth
-} from '@ouim/simple-logto';
+} from '@ouim/logto-authkit';
 import {
   AlertCircle,
   CheckCircle2,
@@ -113,11 +113,11 @@ const SetupPanel = () => (
       <div className="rounded-[32px] border border-stone-200/80 bg-[rgba(255,252,245,0.86)] p-8 shadow-[0_28px_80px_rgba(71,53,30,0.1)] backdrop-blur">
         <p className="text-xs font-bold uppercase tracking-[0.32em] text-stone-500">Example app</p>
         <h1 className="mt-4 text-5xl leading-tight text-stone-900">
-          Local auth playground for <span className="text-[#b85d38]">simple-logto</span>
+          Local auth playground for <span className="text-[#b85d38]">logto-authkit</span>
         </h1>
         <p className="mt-5 max-w-2xl text-base leading-8 text-stone-700">
           This app reads the library directly from the repository source, so any feature or fix you
-          add in <code>@ouim/simple-logto</code> is immediately testable here.
+          add in <code>@ouim/logto-authkit</code> is immediately testable here.
         </p>
 
         <div className="mt-8 rounded-[28px] border border-amber-200 bg-amber-50 p-5">
@@ -199,7 +199,7 @@ const HomePage = ({ events, pushEvent, configSummary }) => {
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-xs font-bold uppercase tracking-[0.32em] text-stone-500">
-                simple-logto sandbox
+                logto-authkit sandbox
               </p>
               <h1 className="mt-4 text-5xl leading-tight text-stone-900">
                 Test auth flows against the{' '}

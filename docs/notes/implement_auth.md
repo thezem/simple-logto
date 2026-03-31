@@ -1,13 +1,13 @@
-# Quick Implementation Guide for @ouim/simple-logto
+# Quick Implementation Guide for @ouim/logto-authkit
 
-This guide walks you through the fastest way to get Logto authentication working in a typical React frontend / Express backend stack using the **@ouim/simple-logto** library. The example configuration is minimal––you can always add more options as needed.
+This guide walks you through the fastest way to get Logto authentication working in a typical React frontend / Express backend stack using the **@ouim/logto-authkit** library. The example configuration is minimal––you can always add more options as needed.
 
 ---
 
 ## 1. Install the package
 
 ```bash
-npm install @ouim/simple-logto
+npm install @ouim/logto-authkit
 ```
 
 > The library contains both frontend React helpers and backend JWT/authentication utilities. No separate installation is required for the server.
@@ -21,7 +21,7 @@ npm install @ouim/simple-logto
 Wrap your app at the top level and supply your Logto endpoint and app ID.
 
 ```tsx
-import { AuthProvider } from '@ouim/simple-logto'
+import { AuthProvider } from '@ouim/logto-authkit'
 
 const logtoConfig = {
   endpoint: 'https://your-logto-domain.com',
@@ -44,7 +44,7 @@ Use `customNavigate` prop if you need to integrate with React Router or Next.js 
 The easiest way to show sign‑in / sign‑out and a user menu is with `UserCenter`.
 
 ```tsx
-import { UserCenter } from '@ouim/simple-logto'
+import { UserCenter } from '@ouim/logto-authkit'
 
 function Navbar() {
   return (
@@ -63,7 +63,7 @@ If you prefer to build your own buttons you can use the `useAuth` hook directly 
 Create a route that renders `CallbackPage` to process redirects or popup responses.
 
 ```tsx
-import { CallbackPage } from '@ouim/simple-logto'
+import { CallbackPage } from '@ouim/logto-authkit'
 
 export default function Callback() {
   return <CallbackPage />
@@ -75,7 +75,7 @@ Optionally provide `onSuccess`, `onError`, or custom loading/success components.
 ### d. Protect routes (optional)
 
 ```tsx
-import { useAuth } from '@ouim/simple-logto'
+import { useAuth } from '@ouim/logto-authkit'
 
 function Dashboard() {
   const { user } = useAuth({ middleware: 'auth', redirectTo: '/login' })
@@ -95,7 +95,7 @@ For guest mode allow `middleware: 'guest'` and the hook will return either an au
 ```js
 // server.js or app.js
 import express from 'express'
-import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server'
 
 const app = express()
 
@@ -125,7 +125,7 @@ app.listen(4000, () => console.log('Server running'))
 You can use `verifyAuth` for ad‑hoc token verification if you’re not using Express:
 
 ```js
-import { verifyAuth } from '@ouim/simple-logto/backend'
+import { verifyAuth } from '@ouim/logto-authkit/server'
 
 async function checkToken(token) {
   try {
@@ -152,7 +152,7 @@ Ensure `jose` works in your build environment by extending the provided config h
 
 ```js
 // vite.config.js
-import { viteConfig } from '@ouim/simple-logto/bundler-config'
+import { viteConfig } from '@ouim/logto-authkit/bundler-config'
 export default { ...viteConfig }
 ```
 
@@ -165,10 +165,10 @@ Use `webpackConfig` or `nextjsConfig` for Webpack/Next.js. You can also call `ge
 All public types are exported from the root. Example:
 
 ```ts
-import type { LogtoUser, AuthOptions } from '@ouim/simple-logto'
+import type { LogtoUser, AuthOptions } from '@ouim/logto-authkit'
 ```
 
-Backend types live under `@ouim/simple-logto/backend` and include `AuthContext` and `VerifyAuthOptions`.
+Backend types live under `@ouim/logto-authkit/server` and include `AuthContext` and `VerifyAuthOptions`.
 
 ---
 
@@ -177,7 +177,7 @@ Backend types live under `@ouim/simple-logto/backend` and include `AuthContext` 
 1. **Callback URL mismatch**: make sure the URL passed to `AuthProvider` matches the redirect URI registered in Logto.
 2. **Guest mode tokens**: enable `allowGuest` both frontend and backend if you want un‑authenticated visitors to receive a fingerprint-based ID.
 3. **Token refresh**: call `refreshAuth()` from `useAuth` when you need to renew tokens without a full reload.
-4. **Migration path**: if you outgrow `@ouim/simple-logto`, you can drop down to `@logto/react` or your own UI while still using backend helpers.
+4. **Migration path**: if you outgrow `@ouim/logto-authkit`, you can drop down to `@logto/react` or your own UI while still using backend helpers.
 
 ---
 

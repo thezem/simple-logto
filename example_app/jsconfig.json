@@ -12,9 +12,9 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": ["./src/*"],
-      "@ouim/simple-logto": ["../src/index.ts"],
-      "@ouim/simple-logto/backend": ["../src/backend/index.ts"],
-      "@ouim/simple-logto/bundler-config": ["../src/bundler-config.ts"]
+      "@ouim/logto-authkit": ["../src/index.ts"],
+      "@ouim/logto-authkit/server": ["../src/server/index.ts"],
+      "@ouim/logto-authkit/bundler-config": ["../src/bundler-config.ts"]
     },
     "allowImportingTsExtensions": true,
     "noEmit": true

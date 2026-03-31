@@ -1,7 +1,7 @@
-// Example Next.js API route using @ouim/simple-logto/backend
+// Example Next.js API route using @ouim/logto-authkit/server
 // app/api/protected/route.js
 
-import { verifyNextAuth } from '@ouim/simple-logto/backend'
+import { verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function GET(request) {
   const authResult = await verifyNextAuth(request, {

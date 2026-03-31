@@ -1,8 +1,8 @@
-# simple-logto React + backend example app
+# logto-authkit React + server example app
 
 This app is a local auth playground for the library in the parent repo.
 
-It does not consume a published package. Vite aliases `@ouim/simple-logto` directly to `../src`, so changes you make to the library are reflected here immediately.
+It does not consume a published package. Vite aliases `@ouim/logto-authkit` directly to `../src`, so changes you make to the library are reflected here immediately.
 
 The frontend example lives in `src/`, and the matching backend-verification sample lives in `server/auth-server.mjs`.
 

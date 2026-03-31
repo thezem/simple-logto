@@ -32,13 +32,13 @@ Do not push if any step fails. Fix the failure first.
 
 ## Architecture
 
-This is a **single npm package** (`@ouim/simple-logto`) with three published entrypoints:
+This is a **single npm package** (`@ouim/logto-authkit`) with three published entrypoints:
 
 | Entrypoint | Source | Purpose |
 |---|---|---|
-| `@ouim/simple-logto` | `src/index.ts` | React frontend (components, hooks, provider) |
-| `@ouim/simple-logto/backend` | `src/backend/index.ts` | Node.js JWT verification (no DOM APIs) |
-| `@ouim/simple-logto/bundler-config` | `src/bundler-config.ts` | Vite/Webpack/Next.js config helpers |
+| `@ouim/logto-authkit` | `src/index.ts` | React frontend (components, hooks, provider) |
+| `@ouim/logto-authkit/server` | `src/server/index.ts` | Node.js JWT verification (no DOM APIs) |
+| `@ouim/logto-authkit/bundler-config` | `src/bundler-config.ts` | Vite/Webpack/Next.js config helpers |
 
 ### Frontend (`src/`)
 
@@ -51,7 +51,7 @@ This is a **single npm package** (`@ouim/simple-logto`) with three published ent
 - `utils.ts` — cookie and JWT cookie utilities
 - `components/ui/` — Radix UI primitives (avatar, dialog, dropdown, tooltip)
 
-### Backend (`src/backend/`)
+### Backend (`src/server/`)
 
 - `verify-auth.ts` — core JWT verification via `jose` and Logto JWKS endpoint (with caching)
 - `index.ts` — exports `verifyAuth`, `verifyNextAuth`, `createExpressAuthMiddleware`

@@ -1,4 +1,4 @@
-# @ouim/simple-logto TODO List
+# @ouim/logto-authkit TODO List
 
 ## 🔴 Critical (Security & Stability)
 
