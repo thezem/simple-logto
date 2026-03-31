@@ -189,7 +189,7 @@ Total: ~730 lines (now 825+ lines)
 3. Implement: Use provided patterns and helpers
 
 ### 👤 Backend Developers
-1. Start: src/backend/README.md (API reference)
+1. Start: src/server/README.md (API reference)
 2. Learn: PERMISSIONS_AND_AUTHORIZATION.md (authorization)
 3. Integrate: Follow Express or Next.js examples
 

@@ -1,7 +1,7 @@
 'use client'
 
-import type { AuthProviderProps } from '@ouim/simple-logto'
-import { AuthProvider } from '@ouim/simple-logto'
+import type { AuthProviderProps } from '@ouim/logto-authkit'
+import { AuthProvider } from '@ouim/logto-authkit'
 import { useRouter } from 'next/navigation'
 
 const logtoConfig: AuthProviderProps['config'] = {

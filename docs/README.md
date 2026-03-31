@@ -1,6 +1,6 @@
 # Documentation Index
 
-Welcome to the `@ouim/simple-logto` documentation. This guide helps you navigate all available resources.
+Welcome to the `@ouim/logto-authkit` documentation. This guide helps you navigate all available resources.
 
 ## Getting Started
 
@@ -60,7 +60,7 @@ Breaking changes and new features in v0.1.9+:
 ---
 
 ### 4. Backend API Reference
-**File:** [../src/backend/README.md](../src/backend/README.md)
+**File:** [../src/server/README.md](../src/server/README.md)
 
 Complete backend verification documentation:
 - JWT verification overview
@@ -101,7 +101,7 @@ Focused guide for local `file:` dependencies and symlinked development:
 - preserving inherited `viteConfig.resolve` settings
 - Next.js App Router client-boundary issues
 
-**Read this if:** You're developing `@ouim/simple-logto` locally and consuming it from another app via `file:../simple-logto` or a symlink.
+**Read this if:** You're developing `@ouim/logto-authkit` locally and consuming it from another app via `file:../simple-logto` or a symlink.
 
 ---
 
@@ -194,7 +194,7 @@ Guidance for Claude Code and AI agents contributing to this repository. Includes
 **"I'm setting up authentication for the first time"**
 1. Start with [../README.md](../README.md) — Quick Start section
 2. Follow [../MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) if upgrading from older version
-3. Check [../src/backend/README.md](../src/backend/README.md) for backend setup
+3. Check [../src/server/README.md](../src/server/README.md) for backend setup
 
 **"I need role-based access control"**
 1. Read [PERMISSIONS_AND_AUTHORIZATION.md](./PERMISSIONS_AND_AUTHORIZATION.md)
@@ -243,7 +243,7 @@ Guidance for Claude Code and AI agents contributing to this repository. Includes
 
 ### Public Resources
 - **GitHub:** https://github.com/ouim-me/simple-logto
-- **npm:** https://www.npmjs.com/package/@ouim/simple-logto
+- **npm:** https://www.npmjs.com/package/@ouim/logto-authkit
 - **Logto:** https://logto.io
 - **@logto/react:** https://docs.logto.io/docs/sdk/react
 

@@ -1,4 +1,4 @@
-import { verifyNextAuth } from '@ouim/simple-logto/backend'
+import { verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function GET(request: Request) {
   const result = await verifyNextAuth(request, {

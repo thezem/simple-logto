@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to `@ouim/simple-logto` are documented here.
+All notable changes to `@ouim/logto-authkit` are documented here.
 
 This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
@@ -8,6 +8,20 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 ---
 
 ## [Unreleased]
+
+## [0.3.0] — 2026-03-31
+
+### Changed
+- Renamed the package from `@ouim/simple-logto` to `@ouim/logto-authkit`
+- Renamed the server entrypoint from `@ouim/simple-logto/backend` to `@ouim/logto-authkit/server`
+- Kept the bundler helper entrypoint as `@ouim/logto-authkit/bundler-config`
+- Renamed the internal source tree from `src/backend/` to `src/server/`
+
+### Migration
+- `@ouim/simple-logto` -> `@ouim/logto-authkit`
+- `@ouim/simple-logto/backend` -> `@ouim/logto-authkit/server`
+- `@ouim/simple-logto/bundler-config` -> `@ouim/logto-authkit/bundler-config`
+- There is no compatibility shim for `/backend`
 
 ## [0.2.1] — 2026-03-31
 
@@ -50,7 +64,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 - All cookie writes (auth + guest) now go through `cookieUtils` with `Secure: true`, `SameSite: Strict`
 - Documented XSS/non-`httpOnly` cookie limitation with backend-assisted mitigation example
 - Added `buildAuthCookieHeader` backend helper for `HttpOnly` cookie upgrade
-- Added CSRF double-submit cookie protection helpers (`src/backend/csrf.ts`)
+- Added CSRF double-submit cookie protection helpers (`src/server/csrf.ts`)
 
 ---
 
@@ -77,6 +91,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ---
 
-[Unreleased]: https://github.com/ouim-me/simple-logto/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/ouim-me/simple-logto/compare/v0.3.0...HEAD
 [0.1.8]: https://github.com/ouim-me/simple-logto/releases/tag/v0.1.8
 [0.2.1]: https://github.com/ouim-me/simple-logto/releases/tag/v0.2.1
+[0.3.0]: https://github.com/ouim-me/simple-logto/releases/tag/v0.3.0

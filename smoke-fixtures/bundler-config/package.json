@@ -1,5 +1,5 @@
 {
-  "name": "simple-logto-smoke-bundler-config",
+  "name": "logto-authkit-smoke-bundler-config",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,7 +8,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@ouim/simple-logto": "__SIMPLE_LOGTO_TARBALL__"
+    "@ouim/logto-authkit": "__SIMPLE_LOGTO_TARBALL__"
   },
   "devDependencies": {
     "@types/node": "^22.15.21",

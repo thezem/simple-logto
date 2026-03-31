@@ -1,5 +1,5 @@
-import { createExpressAuthMiddleware, hasRole, hasScopes, requireRole, requireScopes } from '@ouim/simple-logto/backend'
-import type { AuthContext, VerifyAuthOptions } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware, hasRole, hasScopes, requireRole, requireScopes } from '@ouim/logto-authkit/server'
+import type { AuthContext, VerifyAuthOptions } from '@ouim/logto-authkit/server'
 
 const options: VerifyAuthOptions = {
   logtoUrl: 'https://example.logto.app',

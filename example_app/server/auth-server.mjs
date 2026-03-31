@@ -1,5 +1,5 @@
 import express from 'express'
-import { createExpressAuthMiddleware } from '../../dist/backend/index.js'
+import { createExpressAuthMiddleware } from '../../dist/server/index.js'
 
 const app = express()
 app.use(express.json())

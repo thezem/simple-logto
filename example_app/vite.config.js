@@ -16,7 +16,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   optimizeDeps: {
     include: ['@logto/react'],
-    exclude: ['@ouim/simple-logto', '@ouim/simple-logto/backend', '@ouim/simple-logto/bundler-config']
+    exclude: ['@ouim/logto-authkit', '@ouim/logto-authkit/server', '@ouim/logto-authkit/bundler-config']
   },
   resolve: {
     dedupe: ['react', 'react-dom'],
@@ -24,9 +24,9 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src'),
       react: path.resolve(appNodeModules, 'react'),
       'react-dom': path.resolve(appNodeModules, 'react-dom'),
-      '@ouim/simple-logto': path.resolve(__dirname, '../src/index.ts'),
-      '@ouim/simple-logto/backend': path.resolve(__dirname, '../src/backend/index.ts'),
-      '@ouim/simple-logto/bundler-config': path.resolve(__dirname, '../src/bundler-config.ts')
+      '@ouim/logto-authkit': path.resolve(__dirname, '../src/index.ts'),
+      '@ouim/logto-authkit/server': path.resolve(__dirname, '../src/server/index.ts'),
+      '@ouim/logto-authkit/bundler-config': path.resolve(__dirname, '../src/bundler-config.ts')
     }
   }
 });

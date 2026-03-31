@@ -1,7 +1,7 @@
 // Simple test example for the Logto backend verification
 // This is not a real test file, just for demonstration
 
-import { verifyAuth } from '@ouim/simple-logto/backend'
+import { verifyAuth } from '@ouim/logto-authkit/server'
 
 async function _testVerification() {
   try {

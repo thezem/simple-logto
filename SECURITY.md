@@ -34,10 +34,10 @@ Please avoid public disclosure until the issue has been confirmed and a remediat
 
 ## Scope
 
-This policy covers vulnerabilities in the published `@ouim/simple-logto` package, including:
+This policy covers vulnerabilities in the published `@ouim/logto-authkit` package, including:
 
-- frontend auth helpers and UI exported from `@ouim/simple-logto`
-- backend verification and middleware exported from `@ouim/simple-logto/backend`
-- build helper exports from `@ouim/simple-logto/bundler-config`
+- frontend auth helpers and UI exported from `@ouim/logto-authkit`
+- backend verification and middleware exported from `@ouim/logto-authkit/server`
+- build helper exports from `@ouim/logto-authkit/bundler-config`
 
 Operational issues in third-party services, tenant misconfiguration in consumer apps, or vulnerabilities that exist only in an outdated unsupported version may fall outside direct remediation scope, but they are still useful to report.

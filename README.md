@@ -1,10 +1,10 @@
-# @ouim/simple-logto
+# @ouim/logto-authkit
 
-`@ouim/simple-logto` is a batteries-included auth toolkit for Logto-powered React apps.
+`@ouim/logto-authkit` is a batteries-included auth toolkit for Logto-powered React apps.
 
 > Migration notice
-> This package is scheduled to move to `@ouim/logto-authkit`.
-> Planned import replacements:
+> This package replaces `@ouim/simple-logto`.
+> Import replacements:
 > `@ouim/simple-logto` -> `@ouim/logto-authkit`
 > `@ouim/simple-logto/backend` -> `@ouim/logto-authkit/server`
 > `@ouim/simple-logto/bundler-config` -> `@ouim/logto-authkit/bundler-config`
@@ -62,7 +62,7 @@ If you want Logto without re-assembling the same frontend and backend auth plumb
 ## Installation
 
 ```bash
-npm install @ouim/simple-logto @logto/react
+npm install @ouim/logto-authkit @logto/react
 ```
 
 Peer dependencies:
@@ -124,7 +124,7 @@ These validate the package works across different bundler and framework combinat
 ### 1. Wrap your app
 
 ```tsx
-import { AuthProvider } from '@ouim/simple-logto'
+import { AuthProvider } from '@ouim/logto-authkit'
 
 const logtoConfig = {
   endpoint: 'https://your-tenant.logto.app',
@@ -144,7 +144,7 @@ export function AppProviders({ children }: { children: React.ReactNode }) {
 ### 2. Add the callback route
 
 ```tsx
-import { CallbackPage } from '@ouim/simple-logto'
+import { CallbackPage } from '@ouim/logto-authkit'
 
 export default function CallbackRoute() {
   return <CallbackPage />
@@ -154,7 +154,7 @@ export default function CallbackRoute() {
 ### 3. Add a sign-in entry point
 
 ```tsx
-import { SignInPage } from '@ouim/simple-logto'
+import { SignInPage } from '@ouim/logto-authkit'
 
 export default function SignInRoute() {
   return <SignInPage />
@@ -164,7 +164,7 @@ export default function SignInRoute() {
 ### 4. Use auth anywhere
 
 ```tsx
-import { useAuth } from '@ouim/simple-logto'
+import { useAuth } from '@ouim/logto-authkit'
 
 export function Dashboard() {
   const { user, isLoadingUser, signIn, signOut } = useAuth()
@@ -184,7 +184,7 @@ export function Dashboard() {
 ### 5. Add account UI
 
 ```tsx
-import { UserCenter } from '@ouim/simple-logto'
+import { UserCenter } from '@ouim/logto-authkit'
 
 export function Navbar() {
   return (
@@ -271,7 +271,7 @@ const auth = useAuth({
 Use `usePermission()` for client-side conditional rendering when the current frontend user claims already include permission data.
 
 ```tsx
-import { usePermission } from '@ouim/simple-logto'
+import { usePermission } from '@ouim/logto-authkit'
 
 function AdminActions() {
   const canManageUsers = usePermission('manage:users')
@@ -352,7 +352,7 @@ Optional props:
 For cases where you want a reusable trigger instead of manually calling `signIn()`.
 
 ```tsx
-import { SignInButton } from '@ouim/simple-logto'
+import { SignInButton } from '@ouim/logto-authkit'
 ;<SignInButton />
 ```
 
@@ -374,7 +374,7 @@ Wrap the router tree in `AuthProvider` and pass a router-aware `customNavigate` 
 ```tsx
 'use client'
 
-import { AuthProvider, CallbackPage, SignInPage } from '@ouim/simple-logto'
+import { AuthProvider, CallbackPage, SignInPage } from '@ouim/logto-authkit'
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
 
 function AuthShell() {
@@ -413,7 +413,7 @@ Keep the auth UI behind client components and let the backend subpath handle ser
 // app/providers.tsx
 'use client'
 
-import { AuthProvider } from '@ouim/simple-logto'
+import { AuthProvider } from '@ouim/logto-authkit'
 import { useRouter } from 'next/navigation'
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -431,7 +431,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 // app/signin/page.tsx
 'use client'
 
-import { SignInPage } from '@ouim/simple-logto'
+import { SignInPage } from '@ouim/logto-authkit'
 
 export default function SignIn() {
   return <SignInPage />
@@ -442,14 +442,14 @@ export default function SignIn() {
 // app/callback/page.tsx
 'use client'
 
-import { CallbackPage } from '@ouim/simple-logto'
+import { CallbackPage } from '@ouim/logto-authkit'
 
 export default function Callback() {
   return <CallbackPage />
 }
 ```
 
-For protected server routes, route handlers, or middleware, import from `@ouim/simple-logto/backend` instead of trying to read frontend auth state during SSR.
+For protected server routes, route handlers, or middleware, import from `@ouim/logto-authkit/server` instead of trying to read frontend auth state during SSR.
 
 These React Router and Next.js examples are mirrored by packed smoke fixtures in `smoke-fixtures/` so CI catches export or packaging drift against the documented integration patterns.
 
@@ -458,7 +458,7 @@ These React Router and Next.js examples are mirrored by packed smoke fixtures in
 Import backend helpers from the dedicated subpath:
 
 ```ts
-import { createExpressAuthMiddleware, hasScopes, requireScopes, verifyAuth, verifyNextAuth } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware, hasScopes, requireScopes, verifyAuth, verifyNextAuth } from '@ouim/logto-authkit/server'
 ```
 
 ### Express middleware
@@ -467,7 +467,7 @@ import { createExpressAuthMiddleware, hasScopes, requireScopes, verifyAuth, veri
 
 ```ts
 import express from 'express'
-import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server'
 
 const app = express()
 
@@ -491,7 +491,7 @@ app.get('/api/me', authMiddleware, (req, res) => {
 ### Next.js route handlers
 
 ```ts
-import { verifyNextAuth } from '@ouim/simple-logto/backend'
+import { verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function GET(request: Request) {
   const result = await verifyNextAuth(request, {
@@ -516,7 +516,7 @@ export async function GET(request: Request) {
 For SSR frameworks, make authorization decisions on the server with the backend subpath and pass only the derived result to your rendered UI.
 
 ```ts
-import { verifyAuth } from '@ouim/simple-logto/backend'
+import { verifyAuth } from '@ouim/logto-authkit/server'
 
 export async function loadUserFromRequest(request: Request) {
   const auth = await verifyAuth(request, {
@@ -536,7 +536,7 @@ export async function loadUserFromRequest(request: Request) {
 ### Generic token verification
 
 ```ts
-import { verifyAuth } from '@ouim/simple-logto/backend'
+import { verifyAuth } from '@ouim/logto-authkit/server'
 
 const auth = await verifyAuth('your-jwt-token', {
   logtoUrl: 'https://your-tenant.logto.app',
@@ -559,7 +559,7 @@ const auth = await verifyAuth('your-jwt-token', {
 If you need more than the built-in single `requiredScope` check, use the backend authorization helpers after token verification:
 
 ```ts
-import { hasRole, hasScopes, requireRole, requireScopes, verifyAuth } from '@ouim/simple-logto/backend'
+import { hasRole, hasScopes, requireRole, requireScopes, verifyAuth } from '@ouim/logto-authkit/server'
 
 const auth = await verifyAuth(request, {
   logtoUrl: process.env.LOGTO_URL!,
@@ -593,7 +593,7 @@ Notes:
 Backend verification uses a per-process in-memory JWKS cache by default. If you need tighter control during key rotation, debugging, or unusual network setups, you can tune or clear it explicitly:
 
 ```ts
-import { clearJwksCache, invalidateJwksCache, verifyAuth } from '@ouim/simple-logto/backend'
+import { clearJwksCache, invalidateJwksCache, verifyAuth } from '@ouim/logto-authkit/server'
 
 await verifyAuth(token, {
   logtoUrl: 'https://your-tenant.logto.app',
@@ -624,14 +624,14 @@ This package includes bundler helpers for the `jose` resolution issues that ofte
 For build-time scripts, prefer the dedicated subpath:
 
 ```ts
-import { viteConfig, getBundlerConfig } from '@ouim/simple-logto/bundler-config'
+import { viteConfig, getBundlerConfig } from '@ouim/logto-authkit/bundler-config'
 ```
 
 ### Vite
 
 ```ts
 import { defineConfig } from 'vite'
-import { viteConfig } from '@ouim/simple-logto/bundler-config'
+import { viteConfig } from '@ouim/logto-authkit/bundler-config'
 
 export default defineConfig({
   ...viteConfig,
@@ -641,7 +641,7 @@ export default defineConfig({
 ### Webpack
 
 ```ts
-import { webpackConfig } from '@ouim/simple-logto/bundler-config'
+import { webpackConfig } from '@ouim/logto-authkit/bundler-config'
 
 export default {
   ...webpackConfig,
@@ -651,7 +651,7 @@ export default {
 ### Next.js
 
 ```ts
-import { nextjsConfig } from '@ouim/simple-logto/bundler-config'
+import { nextjsConfig } from '@ouim/logto-authkit/bundler-config'
 
 const nextConfig = {
   ...nextjsConfig,
@@ -674,7 +674,7 @@ import type {
   SignInPageProps,
   AdditionalPage,
   SignInButtonProps,
-} from '@ouim/simple-logto'
+} from '@ouim/logto-authkit'
 
 import type {
   AuthContext,
@@ -686,12 +686,12 @@ import type {
   ExpressNext,
   NextRequest,
   NextResponse,
-} from '@ouim/simple-logto/backend'
+} from '@ouim/logto-authkit/server'
 ```
 
 ## Positioning
 
-`@ouim/simple-logto` is best thought of as the practical app-layer around Logto:
+`@ouim/logto-authkit` is best thought of as the practical app-layer around Logto:
 
 - Logto remains the identity platform
 - `@logto/react` remains the core SDK
@@ -730,8 +730,8 @@ See [docs/MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md) for upgrade instruction
 ## Repository Notes
 
 - frontend and backend helpers are published from the same package
-- backend helpers are exposed from `@ouim/simple-logto/backend`
-- bundler helpers are exposed from `@ouim/simple-logto/bundler-config`
+- backend helpers are exposed from `@ouim/logto-authkit/server`
+- bundler helpers are exposed from `@ouim/logto-authkit/bundler-config`
 
 ## Key Documentation
 
@@ -740,7 +740,7 @@ See [docs/MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md) for upgrade instruction
 - **[SECURITY_AND_FEATURES.md](./docs/SECURITY_AND_FEATURES.md)** — Security hardening, CSRF protection, role-based authorization
 - **[PERMISSIONS_AND_AUTHORIZATION.md](./docs/PERMISSIONS_AND_AUTHORIZATION.md)** — Using `usePermission` and backend authorization helpers
 - **[MIGRATION_GUIDE.md](./docs/MIGRATION_GUIDE.md)** — Upgrade guide for v0.1.9+
-- **[src/backend/README.md](./src/backend/README.md)** — Backend verification API reference
+- **[src/server/README.md](./src/server/README.md)** — Backend verification API reference
 
 ### Project Information
 
@@ -809,7 +809,7 @@ Fix:
 
 ### Local `file:` linked package issues
 
-Cause: when `@ouim/simple-logto` is consumed from a local path or symlink, the app can resolve a different React instance than the linked package. That usually shows up as invalid hook calls in Vite apps, or client/server boundary issues in Next.js App Router.
+Cause: when `@ouim/logto-authkit` is consumed from a local path or symlink, the app can resolve a different React instance than the linked package. That usually shows up as invalid hook calls in Vite apps, or client/server boundary issues in Next.js App Router.
 
 Fix:
 

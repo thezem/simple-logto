@@ -1,4 +1,4 @@
-const { getBundlerConfig, nextjsConfig, viteConfig, webpackConfig } = require('@ouim/simple-logto/bundler-config')
+const { getBundlerConfig, nextjsConfig, viteConfig, webpackConfig } = require('@ouim/logto-authkit/bundler-config')
 
 const vite = getBundlerConfig('vite')
 

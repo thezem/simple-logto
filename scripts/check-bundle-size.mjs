@@ -21,13 +21,13 @@ const sizeBudgets = [
   },
   {
     label: 'backend-esm',
-    file: 'dist/backend/index.js',
+    file: 'dist/server/index.js',
     maxBytes: 15_000,
     maxGzipBytes: 4_500,
   },
   {
     label: 'backend-cjs',
-    file: 'dist/backend/index.cjs',
+    file: 'dist/server/index.cjs',
     maxBytes: 12_000,
     maxGzipBytes: 4_000,
   },

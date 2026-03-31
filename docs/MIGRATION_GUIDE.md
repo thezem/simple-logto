@@ -38,7 +38,7 @@ This document covers changes in recent releases and how to update your code if n
 Check user permissions for conditional rendering:
 
 ```jsx
-import { usePermission } from '@ouim/simple-logto'
+import { usePermission } from '@ouim/logto-authkit'
 
 export function AdminFeature() {
   const isAdmin = usePermission('admin')
@@ -72,7 +72,7 @@ const isAdmin = usePermission('admin', {
 Check permissions server-side:
 
 ```javascript
-import { checkRoleAuthorization, checkMultiScopeAuthorization } from '@ouim/simple-logto/backend'
+import { checkRoleAuthorization, checkMultiScopeAuthorization } from '@ouim/logto-authkit/server'
 
 export async function GET(request) {
   const authResult = await verifyNextAuth(request, {
@@ -99,7 +99,7 @@ New `csrf.ts` module for backend route protection:
 
 ```javascript
 // Express
-import { createCsrfMiddleware } from '@ouim/simple-logto/backend'
+import { createCsrfMiddleware } from '@ouim/logto-authkit/server'
 
 const csrfMiddleware = createCsrfMiddleware()
 app.use(csrfMiddleware)
@@ -111,7 +111,7 @@ app.post('/api/update-profile', (req, res) => {
 
 ```javascript
 // Next.js
-import { verifyCsrfToken } from '@ouim/simple-logto/backend'
+import { verifyCsrfToken } from '@ouim/logto-authkit/server'
 
 export async function POST(request) {
   const result = verifyCsrfToken(request)
@@ -219,7 +219,7 @@ const authMiddleware = createExpressAuthMiddleware({
 Use `buildAuthCookieHeader` to set `HttpOnly` cookies on the backend:
 
 ```javascript
-import { buildAuthCookieHeader, verifyNextAuth } from '@ouim/simple-logto/backend'
+import { buildAuthCookieHeader, verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function GET(request) {
   const result = await verifyNextAuth(request, {
@@ -310,5 +310,5 @@ const isAdmin = usePermission('admin', { claimKeys: ['roles'] })
 
 See the full docs:
 - [docs/SECURITY_AND_FEATURES.md](./SECURITY_AND_FEATURES.md) — Security hardening & advanced features
-- [src/backend/README.md](../src/backend/README.md) — Backend API reference
+- [src/server/README.md](../src/server/README.md) — Backend API reference
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — Development & contribution guide

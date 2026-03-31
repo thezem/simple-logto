@@ -1,8 +1,8 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Route, Routes, useNavigate } from 'react-router-dom'
-import { AuthProvider, CallbackPage, SignInPage, useAuth } from '@ouim/simple-logto'
-import type { AuthProviderProps } from '@ouim/simple-logto'
+import { AuthProvider, CallbackPage, SignInPage, useAuth } from '@ouim/logto-authkit'
+import type { AuthProviderProps } from '@ouim/logto-authkit'
 
 const logtoConfig: AuthProviderProps['config'] = {
   endpoint: 'https://example.logto.app',

@@ -309,7 +309,7 @@ export const jwtCookieUtils = {
    *   1. Keep a strict Content-Security-Policy to reduce XSS attack surface.
    *   2. If your deployment includes a Node.js backend that handles the
    *      callback redirect, use `buildAuthCookieHeader()` from
-   *      `@ouim/simple-logto/backend` to set an `HttpOnly` version of the
+   *      `@ouim/logto-authkit/server` to set an `HttpOnly` version of the
    *      same cookie from the server side. The browser will then send it
    *      automatically and it will be invisible to JavaScript.
    *

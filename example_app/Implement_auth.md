@@ -1,10 +1,10 @@
-# @ouim/simple-logto Integration Guide
+# @ouim/logto-authkit Integration Guide
 
-A practical reference for integrating `@ouim/simple-logto` in a Vite + React + Express project, based on the actual Hearth implementation.
+A practical reference for integrating `@ouim/logto-authkit` in a Vite + React + Express project, based on the actual Hearth implementation.
 
 ## Overview
 
-`@ouim/simple-logto` wraps the Logto OAuth/OIDC platform and exposes:
+`@ouim/logto-authkit` wraps the Logto OAuth/OIDC platform and exposes:
 
 | Layer    | What it provides                                                       |
 | -------- | ---------------------------------------------------------------------- |
@@ -15,7 +15,7 @@ A practical reference for integrating `@ouim/simple-logto` in a Vite + React + E
 ## Installation
 
 ```bash
-npm install @ouim/simple-logto
+npm install @ouim/logto-authkit
 # Backend JWT verification also needs:
 npm install jsonwebtoken axios
 ```
@@ -30,7 +30,7 @@ Import from the dedicated bundler-config sub-path, **not** the root package, and
 
 ```typescript
 // vite.config.ts
-import { viteConfig } from '@ouim/simple-logto/bundler-config';
+import { viteConfig } from '@ouim/logto-authkit/bundler-config';
 import mix from '@ouim/vite-plugin-mix';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
@@ -63,7 +63,7 @@ export default defineConfig(({ mode }) => {
 
 ```typescript
 // src/main.tsx (or src/index.tsx)
-import { AuthProvider, UserScope } from '@ouim/simple-logto'
+import { AuthProvider, UserScope } from '@ouim/logto-authkit'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import NiceModal from '@ebay/nice-modal-react'
@@ -118,7 +118,7 @@ createRoot(document.getElementById('root')!).render(
 
 ```typescript
 // src/pages/Callback.tsx
-import { CallbackPage } from '@ouim/simple-logto'
+import { CallbackPage } from '@ouim/logto-authkit'
 
 export const Callback: React.FC = () => (
   <CallbackPage
@@ -140,7 +140,7 @@ export const Callback: React.FC = () => (
 ### 4. Access auth state — `useAuth`
 
 ```typescript
-import { useAuth } from '@ouim/simple-logto'
+import { useAuth } from '@ouim/logto-authkit'
 
 export default function App() {
   const { user, isLoadingUser, signIn } = useAuth()
@@ -189,7 +189,7 @@ useEffect(() => {
 Drop `UserCenter` anywhere in the UI to get a ready-made login/logout button that uses the configured provider.
 
 ```typescript
-import { UserCenter } from '@ouim/simple-logto'
+import { UserCenter } from '@ouim/logto-authkit'
 
 // Show login button (unauthenticated state in App.tsx)
 <UserCenter
@@ -206,10 +206,10 @@ import { UserCenter } from '@ouim/simple-logto'
 
 ```javascript
 // server/index.js
-import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend';
+import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server';
 ```
 
-> Do **not** import from the root `@ouim/simple-logto` on the server — it contains browser code.
+> Do **not** import from the root `@ouim/logto-authkit` on the server — it contains browser code.
 
 ### 2. Create the middleware
 
@@ -285,7 +285,7 @@ MONGODB_URI=mongodb+srv://...
 
 ## API Exports Quick Reference
 
-### Frontend (`@ouim/simple-logto`)
+### Frontend (`@ouim/logto-authkit`)
 
 | Export           | Kind      | Purpose                                                          |
 | ---------------- | --------- | ---------------------------------------------------------------- |
@@ -295,13 +295,13 @@ MONGODB_URI=mongodb+srv://...
 | `useAuth(opts?)` | Hook      | Read user, loading state, and sign-in/out                        |
 | `UserScope`      | Enum      | Scope constants (`Email`, `Profile`, `Identities`, `CustomData`) |
 
-### Build config (`@ouim/simple-logto/bundler-config`)
+### Build config (`@ouim/logto-authkit/bundler-config`)
 
 | Export       | Kind   | Purpose                                 |
 | ------------ | ------ | --------------------------------------- |
 | `viteConfig` | object | Spread into `defineConfig` return value |
 
-### Backend (`@ouim/simple-logto/backend`)
+### Backend (`@ouim/logto-authkit/server`)
 
 | Export                        | Kind     | Purpose                                              |
 | ----------------------------- | -------- | ---------------------------------------------------- |
@@ -317,7 +317,7 @@ MONGODB_URI=mongodb+srv://...
 | `user` is always null                             | Missing scopes                  | Add required `UserScope.*` values to `AuthProvider` config                                      |
 | Callback page redirects to 404                    | Route not registered            | Add `<Route path="/callback" element={<Callback />} />` and register the URL in Logto dashboard |
 | Infinite loading state                            | Fetching inside `isLoadingUser` | Gate fetch on a stable user ID (see `lastUserIdRef` pattern above)                              |
-| `Cannot find module '@ouim/simple-logto/backend'` | Wrong import on server          | Use the `/backend` sub-path only in server files                                                |
+| `Cannot find module '@ouim/logto-authkit/server'` | Wrong import on server          | Use the `/server` sub-path only in server files                                                 |
 
 ---
 
@@ -334,7 +334,7 @@ MONGODB_URI=mongodb+srv://...
 ## References
 
 - [Logto Documentation](https://docs.logto.io)
-- [@ouim/simple-logto source](https://github.com/thezem/simple-logto)
+- [@ouim/logto-authkit source](https://github.com/thezem/simple-logto)
 - [Logto Documentation](https://docs.logto.io)
-- [@ouim/simple-logto GitHub](https://github.com/thezem/simple-logto)
+- [@ouim/logto-authkit GitHub](https://github.com/thezem/simple-logto)
 - [OAuth 2.0 Specification](https://tools.ietf.org/html/rfc6749)

@@ -1,4 +1,4 @@
-# Backend Authentication for @ouim/simple-logto
+# Server Authentication for @ouim/logto-authkit
 
 This module provides JWT verification helpers for Node.js applications using Logto authentication. The verification is done manually by fetching public keys from Logto's JWKS endpoint and verifying JWT claims locally, providing better control and performance with built-in caching.
 
@@ -17,7 +17,7 @@ This module provides JWT verification helpers for Node.js applications using Log
 The backend helpers are included with the main package:
 
 ```bash
-npm install @ouim/simple-logto
+npm install @ouim/logto-authkit
 ```
 
 ## Usage
@@ -38,7 +38,7 @@ Do not try to infer authoritative server auth state from the frontend package du
 `createExpressAuthMiddleware` automatically parses cookies for you so there's no need to install or `app.use` a separate `cookie-parser` middleware. Just import and mount the helper as shown below.
 
 ```javascript
-import { createExpressAuthMiddleware } from '@ouim/simple-logto/backend'
+import { createExpressAuthMiddleware } from '@ouim/logto-authkit/server'
 
 const authMiddleware = createExpressAuthMiddleware({
   logtoUrl: 'https://your-logto-domain.com',
@@ -62,7 +62,7 @@ app.get('/protected', authMiddleware, (req, res) => {
 
 ```javascript
 // pages/api/protected.js or app/api/protected/route.js
-import { verifyNextAuth } from '@ouim/simple-logto/backend'
+import { verifyNextAuth } from '@ouim/logto-authkit/server'
 
 export async function GET(request) {
   const authResult = await verifyNextAuth(request, {
@@ -88,7 +88,7 @@ export async function GET(request) {
 
 ```javascript
 // middleware.js
-import { verifyNextAuth } from '@ouim/simple-logto/backend'
+import { verifyNextAuth } from '@ouim/logto-authkit/server'
 import { NextResponse } from 'next/server'
 
 export async function middleware(request) {
@@ -117,12 +117,12 @@ export const config = {
 
 ### Pairing Next.js server checks with client auth UI
 
-Use `@ouim/simple-logto` only in client components such as `app/signin/page.tsx`, `app/callback/page.tsx`, or a client-side providers wrapper. Use `@ouim/simple-logto/backend` in route handlers and middleware. That split avoids hydration confusion and keeps browser-only logic out of the server bundle.
+Use `@ouim/logto-authkit` only in client components such as `app/signin/page.tsx`, `app/callback/page.tsx`, or a client-side providers wrapper. Use `@ouim/logto-authkit/server` in route handlers and middleware. That split avoids hydration confusion and keeps browser-only logic out of the server bundle.
 
 ### Generic Usage
 
 ```javascript
-import { verifyAuth } from '@ouim/simple-logto/backend'
+import { verifyAuth } from '@ouim/logto-authkit/server'
 
 // Verify with token string
 try {
@@ -168,7 +168,7 @@ The verification helpers will look for the JWT token in the following order:
 `requiredScope` is intentionally narrow. When you need more than one scope, verify the token first and then use the exported helpers:
 
 ```ts
-import { hasScopes, requireScopes, verifyAuth } from '@ouim/simple-logto/backend'
+import { hasScopes, requireScopes, verifyAuth } from '@ouim/logto-authkit/server'
 
 const auth = await verifyAuth(request, {
   logtoUrl: 'https://your-logto-domain.com',
@@ -192,7 +192,7 @@ requireScopes(auth, ['read:reports', 'write:reports'])
 Use the exported role helpers when your access control is role-oriented instead of scope-oriented:
 
 ```ts
-import { hasRole, requireRole, verifyAuth } from '@ouim/simple-logto/backend'
+import { hasRole, requireRole, verifyAuth } from '@ouim/logto-authkit/server'
 
 const auth = await verifyAuth(request, {
   logtoUrl: 'https://your-logto-domain.com',
@@ -222,7 +222,7 @@ The backend verifier keeps a per-process in-memory JWKS cache by default. That i
 - Call `clearJwksCache()` to flush the entire in-memory JWKS cache for the current process.
 
 ```ts
-import { clearJwksCache, invalidateJwksCache, verifyAuth } from '@ouim/simple-logto/backend'
+import { clearJwksCache, invalidateJwksCache, verifyAuth } from '@ouim/logto-authkit/server'
 
 const auth = await verifyAuth(token, {
   logtoUrl: 'https://your-logto-domain.com',

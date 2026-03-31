@@ -1,6 +1,6 @@
 # Documentation Update Summary
 
-This document summarizes the comprehensive documentation updates made to `@ouim/simple-logto` in v0.1.9.
+This document summarizes the comprehensive documentation updates made to `@ouim/logto-authkit` in v0.1.9.
 
 **Date:** March 30, 2026
 **Scope:** All critical changes from `master` to `rc` branch documented and organized
@@ -178,7 +178,7 @@ Different documents for different needs:
 - **Upgrade:** MIGRATION_GUIDE.md
 - **Security:** SECURITY_AND_FEATURES.md
 - **Permissions:** PERMISSIONS_AND_AUTHORIZATION.md
-- **Backend:** src/backend/README.md
+- **Backend:** src/server/README.md
 - **Contributing:** CONTRIBUTING.md + CI_CD_AND_RELEASES.md
 
 ### 4. **Navigation**

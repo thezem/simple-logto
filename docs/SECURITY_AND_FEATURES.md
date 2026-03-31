@@ -11,7 +11,7 @@ The library includes built-in CSRF protection helpers for backend routes using t
 **For Express.js:**
 
 ```javascript
-import { createCsrfMiddleware } from '@ouim/simple-logto/backend'
+import { createCsrfMiddleware } from '@ouim/logto-authkit/server'
 
 const csrfMiddleware = createCsrfMiddleware({
   cookieName: 'logto_csrf_token', // optional
@@ -30,7 +30,7 @@ app.post('/api/state-change', (req, res) => {
 **For Next.js Route Handlers:**
 
 ```javascript
-import { verifyCsrfToken } from '@ouim/simple-logto/backend'
+import { verifyCsrfToken } from '@ouim/logto-authkit/server'
 
 export async function POST(request) {
   const csrfResult = verifyCsrfToken(request)
@@ -68,12 +68,12 @@ All authentication and guest identity cookies now use consistent security flags:
 
 ```javascript
 // Frontend (non-HttpOnly, JavaScript-readable)
-import { jwtCookieUtils } from '@ouim/simple-logto'
+import { jwtCookieUtils } from '@ouim/logto-authkit'
 
 jwtCookieUtils.saveToken(token) // Uses Secure + SameSite=Strict
 
 // Backend (HttpOnly upgrade recommended)
-import { buildAuthCookieHeader } from '@ouim/simple-logto/backend'
+import { buildAuthCookieHeader } from '@ouim/logto-authkit/server'
 
 const setCookieHeader = buildAuthCookieHeader(verifiedToken, {
   secure: true,
@@ -145,7 +145,7 @@ This prevents:
 **Frontend (conditional rendering):**
 
 ```javascript
-import { usePermission } from '@ouim/simple-logto'
+import { usePermission } from '@ouim/logto-authkit'
 
 export function AdminPanel() {
   const canAdmin = usePermission('admin')
@@ -175,7 +175,7 @@ const hasRole = usePermission('admin', {
 **Backend authorization:**
 
 ```javascript
-import { checkRoleAuthorization, checkMultiScopeAuthorization } from '@ouim/simple-logto/backend'
+import { checkRoleAuthorization, checkMultiScopeAuthorization } from '@ouim/logto-authkit/server'
 
 export async function GET(request) {
   const authResult = await verifyNextAuth(request, {
@@ -258,7 +258,7 @@ const authMiddleware = createExpressAuthMiddleware({
 })
 
 // Or globally
-import { setJWKSCacheTTL } from '@ouim/simple-logto/backend'
+import { setJWKSCacheTTL } from '@ouim/logto-authkit/server'
 setJWKSCacheTTL(600_000) // 10 minutes
 ```
 
@@ -289,7 +289,7 @@ This prevents brief network outages from forcing re-authentication.
 - [ ] Use CSRF protection on all state-changing routes
 - [ ] Validate permissions on both frontend (UX) and backend (security)
 - [ ] Monitor auth errors and retry patterns
-- [ ] Keep `@logto/react` and `@ouim/simple-logto` up to date
+- [ ] Keep `@logto/react` and `@ouim/logto-authkit` up to date
 - [ ] Review Logto tenant security settings regularly
 
 ---
@@ -298,4 +298,4 @@ This prevents brief network outages from forcing re-authentication.
 
 - [SECURITY.md](../SECURITY.md) — Vulnerability disclosure policy
 - [CONTRIBUTING.md](../CONTRIBUTING.md) — Security-related contribution guidelines
-- [src/backend/csrf.ts](../src/backend/csrf.ts) — CSRF implementation details
+- [src/server/csrf.ts](../src/server/csrf.ts) — CSRF implementation details
