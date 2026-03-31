@@ -182,7 +182,7 @@ Automatically publishes to npm when a GitHub release is published.
 ### Security
 - Security improvement
 
-[0.1.9]: https://github.com/ouim-me/simple-logto/compare/v0.1.8...v0.1.9
+[0.1.9]: https://github.com/ouim-me/logto-authkit/compare/v0.1.8...v0.1.9
 ```
 
 3. **Create a GitHub Release:**

@@ -334,7 +334,7 @@ MONGODB_URI=mongodb+srv://...
 ## References
 
 - [Logto Documentation](https://docs.logto.io)
-- [@ouim/logto-authkit source](https://github.com/thezem/simple-logto)
+- [@ouim/logto-authkit source](https://github.com/ouim-me/logto-authkit)
 - [Logto Documentation](https://docs.logto.io)
-- [@ouim/logto-authkit GitHub](https://github.com/thezem/simple-logto)
+- [@ouim/logto-authkit GitHub](https://github.com/ouim-me/logto-authkit)
 - [OAuth 2.0 Specification](https://tools.ietf.org/html/rfc6749)

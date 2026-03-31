@@ -101,7 +101,7 @@ Focused guide for local `file:` dependencies and symlinked development:
 - preserving inherited `viteConfig.resolve` settings
 - Next.js App Router client-boundary issues
 
-**Read this if:** You're developing `@ouim/logto-authkit` locally and consuming it from another app via `file:../simple-logto` or a symlink.
+**Read this if:** You're developing `@ouim/logto-authkit` locally and consuming it from another app via `file:../logto-authkit` or a symlink.
 
 ---
 
@@ -242,7 +242,7 @@ Guidance for Claude Code and AI agents contributing to this repository. Includes
 ## Important Links
 
 ### Public Resources
-- **GitHub:** https://github.com/ouim-me/simple-logto
+- **GitHub:** https://github.com/ouim-me/logto-authkit
 - **npm:** https://www.npmjs.com/package/@ouim/logto-authkit
 - **Logto:** https://logto.io
 - **@logto/react:** https://docs.logto.io/docs/sdk/react

@@ -91,7 +91,7 @@ and [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/).
 
 ---
 
-[Unreleased]: https://github.com/ouim-me/simple-logto/compare/v0.3.0...HEAD
-[0.1.8]: https://github.com/ouim-me/simple-logto/releases/tag/v0.1.8
-[0.2.1]: https://github.com/ouim-me/simple-logto/releases/tag/v0.2.1
-[0.3.0]: https://github.com/ouim-me/simple-logto/releases/tag/v0.3.0
+[Unreleased]: https://github.com/ouim-me/logto-authkit/compare/v0.3.0...HEAD
+[0.1.8]: https://github.com/ouim-me/logto-authkit/releases/tag/v0.1.8
+[0.2.1]: https://github.com/ouim-me/logto-authkit/releases/tag/v0.2.1
+[0.3.0]: https://github.com/ouim-me/logto-authkit/releases/tag/v0.3.0
