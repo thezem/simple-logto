@@ -5,7 +5,7 @@ This guide covers integration issues that show up when consuming `@ouim/logto-au
 ```json
 {
   "dependencies": {
-    "@ouim/logto-authkit": "file:../simple-logto"
+    "@ouim/logto-authkit": "file:../logto-authkit"
   }
 }
 ```

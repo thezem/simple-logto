@@ -21,8 +21,8 @@ Thank you for your interest in contributing! This document covers everything you
 
 ```bash
 # 1. Fork and clone the repo
-git clone https://github.com/ouim-me/simple-logto.git
-cd simple-logto
+git clone https://github.com/ouim-me/logto-authkit.git
+cd logto-authkit
 
 # 2. Install dependencies
 npm install
